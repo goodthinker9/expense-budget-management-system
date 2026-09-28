@@ -2,6 +2,7 @@ import db from "../config/db.js"
 export const checkuserExist =async(email)=>{
     const sql="SELECT * FROM users WHERE email=?"
     const [result] = await db.query(sql, [email])
+    // console.log(result[0])
     return result[0]
 }
 export const registerUserModel=async(userData)=>{

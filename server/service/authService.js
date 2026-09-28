@@ -51,19 +51,22 @@ export const loginService=async(data)=>{
         throw error  
     }
     const isuserExist=await checkuserExist(email)
+    console.log(isuserExist)
     if(!isuserExist){
         const error = new Error("user does not exist")
         error.status=400
         throw error
     }
+    // console.log("User role:", isuserExist.role);
     const isPasswordMatch=await bcrypt.compare(password,isuserExist.password)
     if(!isPasswordMatch){
         const error = new Error("invalid password")
         error.status=400
         throw error
     }
-    const token = jwt.sign({ id: isuserExist.id, email: isuserExist.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: isuserExist.id, role: isuserExist.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
     data.token=token
+    // console.log(isuserExist.role)
     const user={
         id:isuserExist.id,
         role:isuserExist.role,

@@ -31,3 +31,32 @@ export const getCategoryByIdModel=async(id,user_id)=>{
     const [result]=await db.query(sql,[id,user_id])
     return result[0]
 }
+export const checkUpdateCategoryExist = async (user_id, name, id) => {
+    const [rows] = await db.query(
+        `SELECT id
+         FROM categories
+         WHERE user_id = ?
+         AND name = ?
+         AND id != ?
+         LIMIT 1`,
+        [user_id, name, id]
+    );
+
+    return rows.length > 0;
+};
+export const updateCategoryModel = async (id, user_id, name, type) => {
+    const [result] = await db.query(
+        `UPDATE categories
+         SET name = ?, type = ?
+         WHERE id = ?
+         AND user_id = ?`,
+        [name, type, id, user_id]
+    );
+
+    return result;
+};
+export const deleteCategoryModel=async(id,user_id)=>{
+    const sql=`DELETE FROM categories WHERE id=? AND user_id=?`
+    const [result]=await db.query(sql,[id,user_id])
+    return result
+}

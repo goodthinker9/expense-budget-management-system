@@ -21,3 +21,13 @@ export const findcategoryName=async(user_id,name)=>{
     const [result]=await db.query(sql,[user_id,name])
     return result[0]
 }
+export const checkIdExist=async(id,user_id)=>{
+    const sql=`SELECT * FROM categories WHERE id=? AND user_id=?`
+    const [result]=await db.query(sql,[id,user_id])
+    return result[0]
+}
+export const getCategoryByIdModel=async(id,user_id)=>{
+    const sql=`SELECT * FROM categories WHERE id=? AND user_id=?`
+    const [result]=await db.query(sql,[id,user_id])
+    return result[0]
+}

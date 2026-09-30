@@ -1,4 +1,4 @@
-import {createCategoryModel,getCategoryModel,getUserModelById,findcategoryName} from "../model/categoryModel.js"
+import {createCategoryModel,getCategoryModel,getUserModelById,findcategoryName,checkIdExist,getCategoryByIdModel} from "../model/categoryModel.js"
 
 export const createCategoryService = async (data) => {
     const { user_id, name, type } = data;
@@ -36,3 +36,14 @@ export const getCategoryService = async (user_id) => {
     }
     return getCategory;
 };
+        // const result=await getCategoryByIdService(id)
+export const getCategoryByIdService=async(id,user_id)=>{
+    const isIdExist=await checkIdExist(id,user_id)
+    if(!isIdExist){
+        const error=Error("the category not found")
+        error.status=404
+        throw error
+    }
+    const result=await getCategoryByIdModel(id,user_id)
+    return result
+}

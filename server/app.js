@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv"
 import cors from "cors"
 import router from "./routes/authRoute.js"
+import categoryRouter from "./routes/categoryRoute.js"
 dotenv.config()
 const app =express()
 app.use(express.json())
@@ -12,4 +13,5 @@ app.get("/",(req,res)=>{
     })
 })
 app.use("/api/auth",router)
+app.use("/api/category",categoryRouter)
 export default app

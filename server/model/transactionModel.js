@@ -33,3 +33,39 @@ export const deleteTransactionModel=async(user_id,transaction_id)=>{
     const [result]=await db.query(sql,[user_id,transaction_id])
     return result.affectedRows > 0
 }
+export const getTransactionByTypeModel=async(user_id,type,start_date,end_date)=>{
+    let sql = `
+        SELECT
+            transactions.id,
+            transactions.amount,
+            transactions.description,
+            transactions.transaction_date,
+            categories.name AS category_name,
+            categories.type AS category_type
+        FROM transactions
+        JOIN categories
+            ON transactions.category_id = categories.id
+        WHERE transactions.user_id = ?
+    `;
+
+    const values = [user_id];
+
+    if (type) {
+        sql += ` AND categories.type = ?`;
+        values.push(type);
+    }
+
+    if (start_date && end_date) {
+        sql += ` AND transactions.transaction_date >= ?`;
+        values.push(start_date);
+
+        sql += ` AND transactions.transaction_date <= ?`;
+        values.push(end_date);
+    }
+
+    sql += ` ORDER BY transactions.transaction_date DESC`;
+
+    const [rows] = await db.query(sql, values);
+
+    return rows;
+};

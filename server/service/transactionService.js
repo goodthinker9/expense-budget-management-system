@@ -1,5 +1,5 @@
 import { checkIdExist} from "../model/categoryModel.js"
-import { createTransactionModel ,getTransactionModel,getTransactionModelById,updateTransactionModel,deleteTransactionModel} from "../model/transactionModel.js"
+import { createTransactionModel ,getTransactionModel,getTransactionModelById,updateTransactionModel,deleteTransactionModel,getTransactionByTypeModel} from "../model/transactionModel.js"
 export const createTransactionService=async(data,user_id)=>{
     const {amount,category_id,description,transaction_date}=data
     if(!amount || !category_id  || !transaction_date){
@@ -27,15 +27,53 @@ export const createTransactionService=async(data,user_id)=>{
     return createTransaction;
 
 }
-export const getTransactionService=async(user_id)=>{
-    const getTransaction=await getTransactionModel(user_id)
-    if(!getTransaction){
-        const error = new Error("no transaction found")
-        error.status=404
-        throw error
+export const getTransactionService = async (
+    user_id,
+    type,
+    start_date,
+    end_date
+) => {
+
+    if (type && type !== "income" && type !== "expense") {
+        const error = new Error("type must be income or expense");
+        error.status = 400;
+        throw error;
     }
-    return getTransaction
-}
+
+    if ((start_date && !end_date) || (!start_date && end_date)) {
+        const error = new Error(
+            "start_date and end_date must be provided together"
+        );
+        error.status = 400;
+        throw error;
+    }
+
+    if (start_date && end_date) {
+        const start = new Date(start_date);
+        const end = new Date(end_date);
+
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            const error = new Error("invalid date format");
+            error.status = 400;
+            throw error;
+        }
+
+        if (start > end) {
+            const error = new Error(
+                "start_date cannot be after end_date"
+            );
+            error.status = 400;
+            throw error;
+        }
+    }
+ if (!type && !start_date && !end_date) {
+        return await getTransactionModel(user_id);
+    }
+
+    return await getTransactionByTypeModel(user_id, type,start_date, end_date);
+
+    // Model call will come here
+};
 export const getTransactionServiceById=async(user_id,transaction_id)=>{
     const getTransaction=await getTransactionModelById(user_id,transaction_id)
     if(!getTransaction){

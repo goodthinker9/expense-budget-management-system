@@ -19,8 +19,9 @@ export const createTransactionController=async(req,res)=>{
 }
 export const getTransactionController=async(req,res)=>{
     const user_id=req.user.id
+    const {type,start_date,end_date}=req.query
     try {
-        const result=await getTransactionService(user_id)
+        const result=await getTransactionService(user_id,type,start_date,end_date)
         if(result){
             res.status(200).json({
                 message:"transaction fetched successfully",

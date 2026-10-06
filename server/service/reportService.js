@@ -83,3 +83,40 @@ export const getCategoryReportService = async (user_id, month) => {
         categories
     };
 };
+export const getDashboardReportService = async (user_id, month) => {
+
+    if (!month) {
+        const error = new Error("month is required");
+        error.status = 400;
+        throw error;
+    }
+
+    const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
+
+    if (!monthPattern.test(month)) {
+        const error = new Error(
+            "month must be in YYYY-MM format"
+        );
+
+        error.status = 400;
+        throw error;
+    }
+
+    const monthlyReport = await getReportService(
+        user_id,
+        month
+    );
+
+    const categoryReport = await getCategoryReportService(
+        user_id,
+        month
+    );
+
+    return {
+        month,
+        income: monthlyReport.income,
+        expense: monthlyReport.expense,
+        balance: monthlyReport.balance,
+        categories: categoryReport.categories
+    };
+};

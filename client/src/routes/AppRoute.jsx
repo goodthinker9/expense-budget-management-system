@@ -7,20 +7,28 @@ import Transaction from '../pages/Transaction'
 import Category from '../pages/Category'
 import Profile from '../pages/Profile'
 import MainLayout from '../layouts/MainLayout'
+import ProtectedRoute from './ProtectedRoute'
 function AppRoute() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+    
+  <BrowserRouter>
+    <Routes>
+      {/* Public routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Protected routes */}
+      <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/transaction" element={<Transaction />} />
           <Route path="/category" element={<Category />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
-      </Routes>
-    </BrowserRouter>
+      </Route>
+    </Routes>
+  </BrowserRouter>
+
   )
 }
 

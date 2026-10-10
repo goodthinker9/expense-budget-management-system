@@ -1,7 +1,9 @@
-import React,{useState} from 'react'
+import React,{useState,useContext} from 'react'
 import { useNavigate } from 'react-router-dom';
 import { login } from '../services/authService.js';
+import  AuthContext  from '../context/AuthContext.jsx';
 function Login() {
+  const { setUser, setIsAuthenticated } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isloading,setLoading]=useState(false)
@@ -13,8 +15,11 @@ function Login() {
     try {
       const response=await login({ email, password });
       // Handle successful login (e.g., redirect to dashboard)
-      // console.log(response.data.token)
+      console.log(response.data.user)
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      setUser(response.data.user);
+      setIsAuthenticated(true);
       navigate('/dashboard'); // Replace with your desired route
     } catch (error) {
       // Handle login error

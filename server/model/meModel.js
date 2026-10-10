@@ -1,7 +1,7 @@
 import db from "../config/db.js"
-export const getAllUserModel=async()=>{
-    const sql="SELECT id, name, email, role FROM users"
-    const [result] = await db.query(sql)
+export const getAllUserModel=async(userId)=>{
+    const sql="SELECT id, name, email, role FROM users WHERE id=?"
+    const [result] = await db.query(sql, [userId])
     return result
 }
 export const getUserByIdModel=async(id)=>{

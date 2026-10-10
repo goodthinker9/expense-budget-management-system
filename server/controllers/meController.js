@@ -1,7 +1,8 @@
 import {getAllUserService,getUserServiceById} from "../service/meService.js"
 export const getMeController=async(req,res)=>{
+    const userId=req.user.id
     try {
-        const user=await getAllUserService()
+        const user=await getAllUserService(userId)
         if(user){
             res.status(200).json({
             message:"user data fetched successfully",

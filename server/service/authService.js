@@ -51,7 +51,7 @@ export const loginService=async(data)=>{
         throw error  
     }
     const isuserExist=await checkuserExist(email)
-    console.log(isuserExist)
+    // console.log(isuserExist)
     if(!isuserExist){
         const error = new Error("user does not exist")
         error.status=400
@@ -60,7 +60,7 @@ export const loginService=async(data)=>{
     // console.log("User role:", isuserExist.role);
     const isPasswordMatch=await bcrypt.compare(password,isuserExist.password)
     if(!isPasswordMatch){
-        const error = new Error("invalid password")
+        const error = new Error("invalid email or password")
         error.status=400
         throw error
     }

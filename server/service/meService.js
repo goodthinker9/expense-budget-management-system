@@ -1,6 +1,6 @@
 import {getAllUserModel,getUserByIdModel} from "../model/meModel.js"
-export const getAllUserService=async()=>{
-    const getUser=await getAllUserModel()
+export const getAllUserService=async(userId)=>{
+    const getUser=await getAllUserModel(userId)
     if(!getUser){
         const error=new Error("user not found")
         error.status=404

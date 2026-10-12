@@ -1,5 +1,5 @@
 import React,{useState,createContext,useEffect} from 'react'
-import axios from 'axios'
+import api from '../services/app'
 const AuthContext = createContext()
 export function AuthContextProvider({children}) {
   const [user,setUser]=useState(null)
@@ -10,7 +10,7 @@ export function AuthContextProvider({children}) {
     // const userData=localStorage.getItem('user')
     const userData=async()=>{
       try {
-        const response = await axios.get('http://localhost:4000/api/auth/me');
+        const response = await api.get('/api/auth/me');
         // console.log(response.data.data)
         setUser(response.data.data);
         setIsAuthenticated(true);

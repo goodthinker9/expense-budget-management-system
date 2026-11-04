@@ -1,19 +1,21 @@
-import React from 'react'
-import { Outlet } from 'react-router-dom'
-import Navbar from '../components/Navbar'
-import Sidebar from '../components/Sidebar'
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
+import './MainLayout.css';
+
 function MainLayout() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div className="main-layout">
       <Navbar />
-      <div style={{ display: 'flex' }}>
+      <div className="main-layout-body">
         <Sidebar />
-        <main style={{ flex: 1, padding: '1rem' }}>
+        <main className="main-content">
           <Outlet />
         </main>
       </div>
     </div>
-  )
+  );
 }
 
-export default MainLayout
+export default MainLayout;

@@ -1,0 +1,54 @@
+{
+  "email": "abebe@gmail.com",
+  "password": "123456"
+}
+create transaction send from frontend 
+{
+  "category_id": 3,
+  "amount": 250,
+  "description": "Lunch",
+  "transaction_date": "2026-10-01"
+}
+http://localhost:4000/api/transaction?start_date=2026-09-01&end_date=2026-09-05
+http://localhost:4000/api/reports/monthly?month=2026-10
+
+
+-------------------------------------------------------------------------------------------------------------
+React Router provides an important component called:
+
+<Outlet />
+
+Think of it as a placeholder:
+
+MainLayout
+│
+├── Navbar
+├── Sidebar
+│
+└── <Outlet />
+       ↑
+       current page appears here
+
+If the user visits:
+
+/dashboard
+
+the Dashboard component appears inside <Outlet />.
+<Route element={<MainLayout />}>
+
+means “use MainLayout as the common layout for the routes inside me.”
+
+Why wrap the routes?
+
+Because these pages all need the same:
+
+Navbar
+Sidebar
+
+So instead of doing:
+
+<Route path="/dashboard" element={
+    <MainLayout>
+        <Dashboard />
+    </MainLayout>
+} />

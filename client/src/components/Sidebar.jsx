@@ -1,16 +1,53 @@
-import React from 'react'
+import React from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import AuthContext from '../context/AuthContext';
+import { IconDashboard, IconTransactions, IconCategory, IconUser, IconLogout } from './Icons';
+import './Sidebar.css';
+
+const navItems = [
+  { to: '/dashboard', label: 'Dashboard', Icon: IconDashboard },
+  { to: '/transaction', label: 'Transactions', Icon: IconTransactions },
+  { to: '/category', label: 'Categories', Icon: IconCategory },
+  { to: '/profile', label: 'Profile', Icon: IconUser },
+];
 
 function Sidebar() {
+  const { setUser, setIsAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
+    navigate('/login');
+  };
+
   return (
-    <div style={{ backgroundColor: '#f8f9fa', padding: '1rem', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-      <aside>
-        <p>dashboard</p>
-        <p>category</p>
-        <p>transaction</p>
-        <p>profile</p>
-      </aside>
-    </div>
-  )
+    <aside className="sidebar">
+      <nav className="sidebar-nav" aria-label="Main navigation">
+        {navItems.map(({ to, label, Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `sidebar-item${isActive ? ' sidebar-item--active' : ''}`
+            }
+          >
+            <span className="sidebar-icon"><Icon size={18} /></span>
+            <span className="sidebar-label">{label}</span>
+          </NavLink>
+        ))}
+      </nav>
+      <div className="sidebar-footer">
+        <button className="sidebar-logout" onClick={handleLogout}>
+          <span className="sidebar-icon"><IconLogout size={18} /></span>
+          <span className="sidebar-label">Sign Out</span>
+        </button>
+      </div>
+    </aside>
+  );
 }
 
-export default Sidebar
+export default Sidebar;

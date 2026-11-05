@@ -161,3 +161,29 @@
   .tx-filter-row { flex-direction: column; }
   .tx-filter-row .form-group { min-width: 100%; }
 }
+
+/* ── New classes from Step 2 fix ── */
+.tx-num { color: var(--gray-400, #9ca3af); font-size: 0.8rem; }
+.tx-desc { font-weight: 500; color: var(--gray-900, #111827); font-size: 0.875rem; }
+.tx-cat { font-size: 0.8rem; color: var(--gray-500, #6b7280); }
+.tx-date-cell { font-size: 0.8rem; color: var(--gray-400, #9ca3af); }
+.tx-amount-income { font-weight: 600; color: #059669; }
+.tx-amount-expense { font-weight: 600; color: #ef4444; }
+
+.tx-no-categories {
+  font-size: 0.875rem;
+  color: var(--gray-500, #6b7280);
+  padding: 0.5rem 0;
+}
+
+.required-star {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.delete-confirm-text {
+  color: var(--gray-500, #6b7280);
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}

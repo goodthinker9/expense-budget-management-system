@@ -1,66 +1,86 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../services/app.js';
 import './Category.css';
 
+// ── helpers ──────────────────────────────────────────────────────────────────
+
 const EMPTY_FORM = { name: '', type: 'expense' };
 
-const CATEGORY_ICONS = {
-  food: '🍽️',
-  transport: '🚗',
-  shopping: '🛍️',
-  health: '🏥',
-  entertainment: '🎬',
-  education: '📚',
-  salary: '💼',
-  business: '🏢',
-  investment: '📈',
-  rent: '🏠',
-  utilities: '💡',
-  default: '📁',
+const KEYWORD_ICONS = {
+  food: '🍽️', transport: '🚗', shopping: '🛍️', health: '🏥',
+  entertainment: '🎬', education: '📚', salary: '💼', business: '🏢',
+  investment: '📈', rent: '🏠', utilities: '💡',
 };
 
 function getCategoryIcon(name = '') {
   const lower = name.toLowerCase();
-  for (const [key, icon] of Object.entries(CATEGORY_ICONS)) {
+  for (const [key, icon] of Object.entries(KEYWORD_ICONS)) {
     if (lower.includes(key)) return icon;
   }
-  return CATEGORY_ICONS.default;
+  return '📁';
 }
+
+// ── modal with Escape support ────────────────────────────────────────────────
+
+function Modal({ onClose, id, title, maxWidth, children }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  return (
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby={id}>
+      <div className="modal" style={maxWidth ? { maxWidth } : undefined} ref={ref}>
+        <div className="modal-header">
+          <h2 className="modal-title" id={id}>{title}</h2>
+          <button className="modal-close" onClick={onClose} aria-label="Close modal">×</button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ── page ─────────────────────────────────────────────────────────────────────
 
 function Category() {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Modal
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState(null);
 
-  // Delete
   const [deleteId, setDeleteId] = useState(null);
+  const [deleteError, setDeleteError] = useState(null);
 
-  // Filter
   const [filterType, setFilterType] = useState('all');
 
-  const fetchCategories = async () => {
+  // ── data ─────────────────────────────────────────────────────────────────
+
+  const fetchCategories = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const res = await api.get('/api/category');
       setCategories(res.data?.result || []);
-    } catch (_err) {
-      setError('Failed to load categories.');
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Failed to load categories.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    (async () => { await fetchCategories(); })();
+  }, [fetchCategories]);
+
+  // ── modal helpers ────────────────────────────────────────────────────────
 
   const openAdd = () => {
     setEditId(null);
@@ -82,6 +102,8 @@ function Category() {
     setForm(EMPTY_FORM);
     setFormError(null);
   };
+
+  // ── submit ───────────────────────────────────────────────────────────────
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -106,22 +128,32 @@ function Category() {
     }
   };
 
-  const handleDelete = async (id) => {
+  // ── delete ───────────────────────────────────────────────────────────────
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    setDeleteError(null);
     try {
-      await api.delete(`/api/category/${id}`);
+      await api.delete(`/api/category/${deleteId}`);
       setDeleteId(null);
       fetchCategories();
-    } catch (_err) {
-      alert('Failed to delete category. It may be in use by transactions.');
+    } catch (err) {
+      // Inline error instead of alert()
+      setDeleteError(
+        err?.response?.data?.message ||
+          'Failed to delete. This category may be in use by transactions.'
+      );
     }
   };
 
-  const filtered = filterType === 'all'
-    ? categories
-    : categories.filter((c) => c.type === filterType);
+  // ── derived ──────────────────────────────────────────────────────────────
 
-  const incomeCount = categories.filter((c) => c.type === 'income').length;
+  const filtered =
+    filterType === 'all' ? categories : categories.filter((c) => c.type === filterType);
+  const incomeCount  = categories.filter((c) => c.type === 'income').length;
   const expenseCount = categories.filter((c) => c.type === 'expense').length;
+
+  // ── render ───────────────────────────────────────────────────────────────
 
   return (
     <div className="categories-page">
@@ -136,41 +168,26 @@ function Category() {
         </button>
       </div>
 
-      {/* Stats */}
+      {/* Filter pills */}
       <div className="cat-stats">
-        <div
-          className={`cat-stat-pill ${filterType === 'all' ? 'active' : ''}`}
-          onClick={() => setFilterType('all')}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && setFilterType('all')}
-        >
-          <span>📁</span>
-          <span>All</span>
-          <span className="cat-stat-count">{categories.length}</span>
-        </div>
-        <div
-          className={`cat-stat-pill income ${filterType === 'income' ? 'active' : ''}`}
-          onClick={() => setFilterType('income')}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && setFilterType('income')}
-        >
-          <span>📈</span>
-          <span>Income</span>
-          <span className="cat-stat-count">{incomeCount}</span>
-        </div>
-        <div
-          className={`cat-stat-pill expense ${filterType === 'expense' ? 'active' : ''}`}
-          onClick={() => setFilterType('expense')}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && setFilterType('expense')}
-        >
-          <span>📉</span>
-          <span>Expense</span>
-          <span className="cat-stat-count">{expenseCount}</span>
-        </div>
+        {[
+          { key: 'all',     label: 'All',     icon: '📁', count: categories.length },
+          { key: 'income',  label: 'Income',  icon: '📈', count: incomeCount },
+          { key: 'expense', label: 'Expense', icon: '📉', count: expenseCount },
+        ].map(({ key, label, icon, count }) => (
+          <div
+            key={key}
+            className={`cat-stat-pill ${key !== 'all' ? key : ''} ${filterType === key ? 'active' : ''}`}
+            onClick={() => setFilterType(key)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && setFilterType(key)}
+          >
+            <span>{icon}</span>
+            <span>{label}</span>
+            <span className="cat-stat-count">{count}</span>
+          </div>
+        ))}
       </div>
 
       {/* Content */}
@@ -186,7 +203,7 @@ function Category() {
             <div className="empty-state-desc">
               {filterType !== 'all'
                 ? `No ${filterType} categories found`
-                : 'Click "New Category" to create your first category'}
+                : 'Click "+ New Category" to get started'}
             </div>
           </div>
         </div>
@@ -197,7 +214,11 @@ function Category() {
               <div className="cat-card-icon">{getCategoryIcon(cat.name)}</div>
               <div className="cat-card-body">
                 <span className="cat-card-name">{cat.name}</span>
-                <span className={`badge ${cat.type === 'income' ? 'badge-income' : 'badge-expense'}`}>
+                <span
+                  className={`badge ${
+                    cat.type === 'income' ? 'badge-income' : 'badge-expense'
+                  }`}
+                >
                   {cat.type}
                 </span>
               </div>
@@ -205,15 +226,13 @@ function Category() {
                 <button
                   className="cat-action edit"
                   onClick={() => openEdit(cat)}
-                  title="Edit"
                   aria-label={`Edit ${cat.name}`}
                 >
                   ✏️
                 </button>
                 <button
                   className="cat-action delete"
-                  onClick={() => setDeleteId(cat.id)}
-                  title="Delete"
+                  onClick={() => { setDeleteError(null); setDeleteId(cat.id); }}
                   aria-label={`Delete ${cat.name}`}
                 >
                   🗑️
@@ -224,94 +243,100 @@ function Category() {
         </div>
       )}
 
-      {/* Add/Edit Modal */}
+      {/* Add / Edit Modal */}
       {showModal && (
-        <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cat-modal-title">
-          <div className="modal">
-            <div className="modal-header">
-              <h2 className="modal-title" id="cat-modal-title">
-                {editId ? 'Edit Category' : 'New Category'}
-              </h2>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">×</button>
+        <Modal onClose={closeModal} id="cat-modal-title" title={editId ? 'Edit Category' : 'New Category'}>
+          {formError && (
+            <div className="alert alert-error" role="alert">{formError}</div>
+          )}
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label">Type</label>
+              <div className="type-toggle">
+                {['income', 'expense'].map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    className={`type-toggle-btn ${form.type === t ? `active-${t}` : ''}`}
+                    onClick={() => setForm((prev) => ({ ...prev, type: t }))}
+                  >
+                    {t === 'income' ? '📈 Income' : '📉 Expense'}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {formError && <div className="alert alert-error">{formError}</div>}
+            <div className="form-group">
+              <label className="form-label" htmlFor="cat-name">Category Name</label>
+              <input
+                id="cat-name"
+                name="name"
+                type="text"
+                className="form-input"
+                placeholder="e.g. Food & Groceries"
+                value={form.name}
+                onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+                required
+                autoFocus
+              />
+            </div>
 
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Type</label>
-                <div className="type-toggle">
-                  {['income', 'expense'].map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      className={`type-toggle-btn ${form.type === t ? 'active-' + t : ''}`}
-                      onClick={() => setForm({ ...form, type: t })}
-                    >
-                      {t === 'income' ? '📈 Income' : '📉 Expense'}
-                    </button>
-                  ))}
+            {form.name && (
+              <div className="cat-preview">
+                <span className="cat-preview-icon">{getCategoryIcon(form.name)}</span>
+                <div>
+                  <span className="cat-preview-name">{form.name}</span>
+                  <span
+                    className={`badge ${form.type === 'income' ? 'badge-income' : 'badge-expense'}`}
+                    style={{ marginLeft: '0.5rem' }}
+                  >
+                    {form.type}
+                  </span>
                 </div>
               </div>
+            )}
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="cat-name">Category Name</label>
-                <input
-                  id="cat-name"
-                  name="name"
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Food & Groceries"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  required
-                  autoFocus
-                />
-              </div>
-
-              {/* Preview */}
-              {form.name && (
-                <div className="cat-preview">
-                  <span className="cat-preview-icon">{getCategoryIcon(form.name)}</span>
-                  <div>
-                    <span className="cat-preview-name">{form.name}</span>
-                    <span className={`badge ${form.type === 'income' ? 'badge-income' : 'badge-expense'}`} style={{ marginLeft: '0.5rem' }}>
-                      {form.type}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-ghost" onClick={closeModal}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={formLoading}>
-                  {formLoading ? (
-                    <><span className="btn-spinner" /> Saving...</>
-                  ) : editId ? 'Update' : 'Create'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-ghost" onClick={closeModal}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={formLoading}>
+                {formLoading
+                  ? <><span className="btn-spinner" /> Saving…</>
+                  : editId ? 'Update' : 'Create'}
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
 
-      {/* Delete Confirm */}
+      {/* Delete Confirm Modal */}
       {deleteId && (
-        <div className="modal-overlay" role="dialog" aria-modal="true">
-          <div className="modal" style={{ maxWidth: 380 }}>
-            <div className="modal-header">
-              <h2 className="modal-title">Delete Category</h2>
-              <button className="modal-close" onClick={() => setDeleteId(null)} aria-label="Close">×</button>
-            </div>
-            <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-              Are you sure you want to delete this category? This may affect related transactions.
-            </p>
-            <div className="modal-footer">
-              <button className="btn btn-ghost" onClick={() => setDeleteId(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={() => handleDelete(deleteId)}>Delete</button>
-            </div>
+        <Modal
+          onClose={() => { setDeleteId(null); setDeleteError(null); }}
+          id="cat-del-title"
+          title="Delete Category"
+          maxWidth={380}
+        >
+          <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
+            Are you sure you want to delete this category? This may affect
+            related transactions.
+          </p>
+          {deleteError && (
+            <div className="alert alert-error" role="alert">{deleteError}</div>
+          )}
+          <div className="modal-footer">
+            <button
+              className="btn btn-ghost"
+              onClick={() => { setDeleteId(null); setDeleteError(null); }}
+            >
+              Cancel
+            </button>
+            <button className="btn btn-danger" onClick={handleDelete}>
+              Delete
+            </button>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

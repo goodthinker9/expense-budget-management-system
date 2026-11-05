@@ -57,8 +57,9 @@ function uid() {
 
 // Remove password field from user object before returning to client
 function omitPassword(user) {
-  const { password: _pw, ...safe } = user; // eslint-disable-line no-unused-vars
-  return safe;
+  const copy = { ...user };
+  delete copy.password;
+  return copy;
 }
 
 // Simple JWT-like token: base64(payload) (NOT cryptographically secure, mock only)

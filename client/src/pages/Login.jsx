@@ -1,5 +1,5 @@
-import { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+﻿import { useState, useContext } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { login } from '../services/authService.js';
 import AuthContext from '../context/AuthContext.jsx';
 import { IconMail, IconLock, IconEye, IconEyeOff } from '../components/Icons';
@@ -7,27 +7,43 @@ import './Auth.css';
 
 function Login() {
   const { setUser, setIsAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+
+  // Message passed via router state from Register when no token was returned
+  const successMsg = location.state?.message ?? null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
     try {
-      const response = await login({ email, password });
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      setUser(response.user);
+      // login() returns response.data: { message, data: { token, user } }
+      // Accept nested shape (.data.token) or flat top-level (.token).
+      const payload = await login({ email, password });
+      const token = payload?.data?.token ?? payload?.token;
+      const user  = payload?.data?.user  ?? payload?.user;
+
+      if (!token || !user) {
+        throw new Error('Unexpected response from server. Please try again.');
+      }
+
+      localStorage.setItem('token', token);
+      setUser(user);
       setIsAuthenticated(true);
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch (err) {
-      const message = err?.response?.data?.message || 'Login failed. Please try again.';
-      setError(message);
+      setError(
+        err?.response?.data?.message ??
+        err?.message ??
+        'Login failed. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -35,24 +51,18 @@ function Login() {
 
   return (
     <div className="auth-page">
-      {/* Left Panel */}
       <div className="auth-left">
-        {/* Background video like Monarch hero */}
-        <video
-          className="auth-video"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/image/image.png"
-        >
-          {/* Free Pexels video: Person counting money / finance */}
+        <video className="auth-video" autoPlay muted loop playsInline poster="/image/image.png">
           <source src="https://videos.pexels.com/video-files/6326935/6326935-hd_1920_1080_25fps.mp4" type="video/mp4" />
         </video>
         <div className="auth-left-overlay" />
         <div className="auth-left-content">
           <Link to="/" className="auth-logo">
-            <span>💰</span>
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <rect width="28" height="28" rx="6" fill="#e8572a"/>
+              <path d="M7 8h10M7 14h7M7 20h10" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
+              <circle cx="21" cy="20" r="3" fill="white"/>
+            </svg>
             <span>FinTrack<span className="auth-logo-accent">ET</span></span>
           </Link>
           <div className="auth-tagline">
@@ -62,7 +72,6 @@ function Login() {
         </div>
       </div>
 
-      {/* Right Panel */}
       <div className="auth-right">
         <div className="auth-form-wrap">
           <div className="auth-header">
@@ -70,19 +79,21 @@ function Login() {
             <p className="auth-subtitle">Sign in to your account to continue</p>
           </div>
 
+          {successMsg && (
+            <div className="alert alert-success" role="status">{successMsg}</div>
+          )}
+
           {error && (
-            <div className="alert alert-error" role="alert">
-              <span>⚠️</span> {error}
-            </div>
+            <div className="alert alert-error" role="alert">{error}</div>
           )}
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label className="form-label" htmlFor="email">Email address</label>
+              <label className="form-label" htmlFor="login-email">Email address</label>
               <div className="input-wrap">
                 <span className="input-icon"><IconMail size={16} color="#6b6b5e" /></span>
                 <input
-                  id="email"
+                  id="login-email"
                   type="email"
                   className="form-input with-icon"
                   placeholder="you@example.com"
@@ -95,11 +106,11 @@ function Login() {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="password">Password</label>
+              <label className="form-label" htmlFor="login-password">Password</label>
               <div className="input-wrap">
                 <span className="input-icon"><IconLock size={16} color="#6b6b5e" /></span>
                 <input
-                  id="password"
+                  id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   className="form-input with-icon with-icon-right"
                   placeholder="Enter your password"
@@ -111,7 +122,7 @@ function Login() {
                 <button
                   type="button"
                   className="input-icon-right"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <IconEyeOff size={16} color="#6b6b5e" /> : <IconEye size={16} color="#6b6b5e" />}
@@ -119,29 +130,17 @@ function Login() {
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="btn btn-primary auth-btn"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <span className="btn-spinner" />
-                  Signing in...
-                </>
-              ) : (
-                'Sign In'
-              )}
+            <button type="submit" className="btn btn-primary auth-btn" disabled={isLoading}>
+              {isLoading ? <><span className="btn-spinner" /> Signing in&hellip;</> : 'Sign In'}
             </button>
           </form>
 
           <p className="auth-switch">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link to="/register" className="auth-link">Create one for free</Link>
           </p>
-
           <div className="auth-home-link">
-            <Link to="/">← Back to home</Link>
+            <Link to="/">&larr; Back to home</Link>
           </div>
         </div>
       </div>

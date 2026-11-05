@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import HomeNav from '../components/HomeNav';
 import HomeFooter from '../components/HomeFooter';
-import { IconChart, IconWallet, IconTarget, IconTrendUp, IconPhone, IconStar, IconArrowRight } from '../components/Icons';
+import { IconChart, IconWallet, IconTarget, IconStar, IconArrowRight } from '../components/Icons';
 import './Home.css';
 
 const reviews = [
@@ -20,19 +19,6 @@ function Stars({ n }) {
       {Array.from({ length: n }).map((_, i) => (
         <IconStar key={i} size={14} color="#f59e0b" filled />
       ))}
-    </div>
-  );
-}
-
-function FaqItem({ q, a }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className={`faq-item ${open ? 'open' : ''}`}>
-      <button className="faq-q" onClick={() => setOpen(!open)}>
-        {q}
-        <span className="faq-arrow">{open ? '−' : '+'}</span>
-      </button>
-      {open && <div className="faq-a">{a}</div>}
     </div>
   );
 }

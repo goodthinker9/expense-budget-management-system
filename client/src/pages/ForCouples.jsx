@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import HomeNav from '../components/HomeNav';
 import HomeFooter from '../components/HomeFooter';

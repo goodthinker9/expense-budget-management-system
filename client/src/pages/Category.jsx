@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../services/app.js';
 import './Category.css';
 
@@ -51,7 +51,7 @@ function Category() {
     try {
       const res = await api.get('/api/category');
       setCategories(res.data?.result || []);
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to load categories.');
     } finally {
       setIsLoading(false);
@@ -111,7 +111,7 @@ function Category() {
       await api.delete(`/api/category/${id}`);
       setDeleteId(null);
       fetchCategories();
-    } catch (err) {
+    } catch (_err) {
       alert('Failed to delete category. It may be in use by transactions.');
     }
   };

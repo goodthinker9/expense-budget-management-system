@@ -17,5 +17,16 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // Allow _-prefixed variables to be "unused" (common catch/destructure pattern)
+      'no-unused-vars': ['error', {
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      }],
+      // Downgrade set-state-in-effect to warn — we intentionally call async
+      // data-fetching functions inside useEffect, which is the correct pattern.
+      'react-hooks/set-state-in-effect': 'warn',
+    },
   },
 ])

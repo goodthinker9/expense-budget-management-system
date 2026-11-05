@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../services/app.js';
 import './Transaction.css';
 
@@ -55,7 +55,7 @@ function Transaction() {
       ]);
       setTransactions(txRes.data?.data || []);
       setCategories(catRes.data?.result || []);
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to load transactions.');
     } finally {
       setIsLoading(false);
@@ -64,7 +64,6 @@ function Transaction() {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const openAdd = () => {
@@ -135,7 +134,7 @@ function Transaction() {
       await api.delete(`/api/transaction/${id}`);
       setDeleteId(null);
       fetchData();
-    } catch (err) {
+    } catch (_err) {
       alert('Failed to delete transaction.');
     }
   };

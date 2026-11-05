@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import AuthContext from '../context/AuthContext';
 import api from '../services/app.js';
 import './Profile.css';

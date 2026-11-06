@@ -29,10 +29,10 @@ export const getCategoryByIdModel = async (id, user_id) => {
   return rows[0];
 };
 
-/** Check existence only (lightweight). */
+/** Check existence only (lightweight) — returns { id, type } or undefined. */
 export const checkIdExist = async (id, user_id) => {
   const { rows } = await pool.query(
-    'SELECT id FROM categories WHERE id = $1 AND user_id = $2',
+    'SELECT id, type FROM categories WHERE id = $1 AND user_id = $2',
     [id, user_id]
   );
   return rows[0];

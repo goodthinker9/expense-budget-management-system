@@ -7,6 +7,34 @@ import {
   deleteTransactionModel,
   getTransactionByTypeModel,
 } from '../model/transactionModel.js';
+import { isValidDate } from '../middleware/validateDate.js';
+
+// ── shared validation ─────────────────────────────────────────────────────────
+
+function requireDate(val, field) {
+  if (!val || !isValidDate(val)) {
+    const err = new Error(`${field} must be a valid date (YYYY-MM-DD)`);
+    err.status = 400;
+    throw err;
+  }
+}
+
+function requireDescription(val) {
+  if (!val || !String(val).trim()) {
+    const err = new Error('description is required');
+    err.status = 400;
+    throw err;
+  }
+  const trimmed = String(val).trim();
+  if (trimmed.length > 255) {
+    const err = new Error('description must be 255 characters or fewer');
+    err.status = 400;
+    throw err;
+  }
+  return trimmed;
+}
+
+// ── service functions ─────────────────────────────────────────────────────────
 
 export const createTransactionService = async (data, user_id) => {
   const { amount, category_id, transaction_date } = data;
@@ -19,10 +47,10 @@ export const createTransactionService = async (data, user_id) => {
     const err = new Error('amount must be a positive number');
     err.status = 400; throw err;
   }
-  if (isNaN(Date.parse(transaction_date))) {
-    const err = new Error('transaction_date is not a valid date');
-    err.status = 400; throw err;
-  }
+
+  requireDate(transaction_date, 'transaction_date');
+
+  const description = requireDescription(data.description);
 
   const cat = await checkIdExist(category_id, user_id);
   if (!cat) {
@@ -30,7 +58,10 @@ export const createTransactionService = async (data, user_id) => {
     err.status = 404; throw err;
   }
 
-  return await createTransactionModel(data, user_id);
+  return await createTransactionModel(
+    { ...data, description, amount: Number(amount) },
+    user_id
+  );
 };
 
 export const getTransactionService = async (user_id, type, start_date, end_date) => {
@@ -39,17 +70,10 @@ export const getTransactionService = async (user_id, type, start_date, end_date)
     err.status = 400; throw err;
   }
 
-  // Validate any provided dates
-  if (start_date && isNaN(Date.parse(start_date))) {
-    const err = new Error('start_date is not a valid date');
-    err.status = 400; throw err;
-  }
-  if (end_date && isNaN(Date.parse(end_date))) {
-    const err = new Error('end_date is not a valid date');
-    err.status = 400; throw err;
-  }
+  // Each date is validated independently (both alone and together are valid)
+  if (start_date) requireDate(start_date, 'start_date');
+  if (end_date)   requireDate(end_date,   'end_date');
 
-  // No filters at all → fast path
   if (!type && !start_date && !end_date) {
     return await getTransactionModel(user_id);
   }
@@ -77,10 +101,10 @@ export const updateTransactionService = async (user_id, transaction_id, data) =>
     const err = new Error('amount must be a positive number');
     err.status = 400; throw err;
   }
-  if (isNaN(Date.parse(transaction_date))) {
-    const err = new Error('transaction_date is not a valid date');
-    err.status = 400; throw err;
-  }
+
+  requireDate(transaction_date, 'transaction_date');
+
+  const description = requireDescription(data.description);
 
   const cat = await checkIdExist(category_id, user_id);
   if (!cat) {
@@ -88,7 +112,11 @@ export const updateTransactionService = async (user_id, transaction_id, data) =>
     err.status = 404; throw err;
   }
 
-  const updated = await updateTransactionModel(user_id, transaction_id, data);
+  const updated = await updateTransactionModel(
+    user_id,
+    transaction_id,
+    { ...data, description, amount: Number(amount) }
+  );
   if (!updated) {
     const err = new Error('Transaction not found');
     err.status = 404; throw err;

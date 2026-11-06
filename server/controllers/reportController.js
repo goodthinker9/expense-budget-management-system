@@ -1,52 +1,26 @@
-import {getReportService,getCategoryReportService,getDashboardReportService} from "../service/reportService.js"
-export const getReportController=async(req,res)=>{
-    const user_id=req.user.id
-    const {month}=req.query
-    try {
-        const result=await getReportService(user_id,month)
-        if(result){
-            res.status(200).json({
-                message:"you get the report successfully",
-                result
-            })
-        }
-    } catch (error) {
-        res.status(error.status || 500).json({
-            message:error.message || "internal server error"
-        })
-    }
-}
-export const getReportByCategoryController=async(req,res)=>{
-    const user_id=req.user.id
-    const {month}=req.query
-    try {
-        const result=await getCategoryReportService(user_id,month)
-        if(result){
-            res.status(200).json({
-                message:"you get the report by category successfully",
-                result
-            })
-        }
-    } catch (error) {
-        res.status(error.status || 500).json({
-            message:error.message || "internal server error"
-        })
-    }
-}
-export const getDashboardReportController=async(req,res)=>{
-    const user_id=req.user.id
-    const {month}=req.query
-    try {
-        const result=await getDashboardReportService(user_id,month)
-        if(result){
-            res.status(200).json({
-                message:"you get the dashboard report successfully",
-                result
-            })
-        }
-    } catch (error) {
-        res.status(error.status || 500).json({
-            message:error.message || "internal server error"
-        })
-    }
-}
+import {
+  getReportService,
+  getCategoryReportService,
+  getDashboardReportService,
+} from '../service/reportService.js';
+
+export const getReportController = async (req, res, next) => {
+  try {
+    const result = await getReportService(req.user.id, req.query.month);
+    res.status(200).json({ message: 'Monthly report fetched successfully.', result });
+  } catch (err) { next(err); }
+};
+
+export const getReportByCategoryController = async (req, res, next) => {
+  try {
+    const result = await getCategoryReportService(req.user.id, req.query.month);
+    res.status(200).json({ message: 'Category report fetched successfully.', result });
+  } catch (err) { next(err); }
+};
+
+export const getDashboardReportController = async (req, res, next) => {
+  try {
+    const result = await getDashboardReportService(req.user.id, req.query.month);
+    res.status(200).json({ message: 'Dashboard report fetched successfully.', result });
+  } catch (err) { next(err); }
+};

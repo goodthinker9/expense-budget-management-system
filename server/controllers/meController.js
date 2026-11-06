@@ -4,29 +4,23 @@ import {
   changePasswordService,
 } from '../service/meService.js';
 
-export const getMeController = async (req, res) => {
+export const getMeController = async (req, res, next) => {
   try {
     const user = await getMeService(req.user.id);
     res.status(200).json({ message: 'User fetched successfully.', data: user });
-  } catch (err) {
-    res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
-  }
+  } catch (err) { next(err); }
 };
 
-export const updateMeController = async (req, res) => {
+export const updateMeController = async (req, res, next) => {
   try {
     const user = await updateMeService(req.user.id, req.body);
     res.status(200).json({ message: 'Profile updated successfully.', data: user });
-  } catch (err) {
-    res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
-  }
+  } catch (err) { next(err); }
 };
 
-export const changePasswordController = async (req, res) => {
+export const changePasswordController = async (req, res, next) => {
   try {
     await changePasswordService(req.user.id, req.body);
     res.status(200).json({ message: 'Password changed successfully.' });
-  } catch (err) {
-    res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
-  }
+  } catch (err) { next(err); }
 };

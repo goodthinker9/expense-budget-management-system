@@ -1,13 +1,18 @@
-import express from "express"
-import { registerCntroller,loginController} from "../controllers/authController.js"
-import {getMeController} from "../controllers/meController.js"
-import auth from "../middleware/auth.js"
-import {authorize} from "../middleware/authorize.js"
-import {getMeControllerById} from "../controllers/meController.js"
-const router = express.Router()
+import express from 'express';
+import { registerController, loginController } from '../controllers/authController.js';
+import {
+  getMeController,
+  updateMeController,
+  changePasswordController,
+} from '../controllers/meController.js';
+import auth from '../middleware/auth.js';
 
-router.post("/register",registerCntroller)
-router.post("/login",loginController)
-router.get("/me",auth,authorize("user"),getMeController)
-router.get("/me/:id",auth,authorize("user"),getMeControllerById)
-export default router
+const router = express.Router();
+
+router.post('/register',         registerController);
+router.post('/login',            loginController);
+router.get( '/me',         auth, getMeController);
+router.put( '/me',         auth, updateMeController);
+router.put( '/change-password', auth, changePasswordController);
+
+export default router;

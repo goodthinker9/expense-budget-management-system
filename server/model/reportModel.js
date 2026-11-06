@@ -1,51 +1,38 @@
-import db from "../config/db.js";
+import pool from '../config/db.js';
+
+/**
+ * Monthly income/expense totals for a user.
+ * Uses to_char (pg) instead of DATE_FORMAT (MySQL).
+ */
 export const getReportModel = async (user_id, month) => {
-
-    const sql = `
-        SELECT
-            categories.type,
-            SUM(transactions.amount) AS total
-        FROM transactions
-        JOIN categories
-            ON transactions.category_id = categories.id
-        WHERE transactions.user_id = ?
-        AND DATE_FORMAT(
-            transactions.transaction_date,
-            '%Y-%m'
-        ) = ?
-        GROUP BY categories.type
-    `;
-
-    const [rows] = await db.query(sql, [
-        user_id,
-        month
-    ]);
-
-    return rows;
+  const { rows } = await pool.query(
+    `SELECT c.type,
+            SUM(t.amount) AS total
+     FROM transactions t
+     JOIN categories c ON t.category_id = c.id
+     WHERE t.user_id = $1
+       AND to_char(t.transaction_date, 'YYYY-MM') = $2
+     GROUP BY c.type`,
+    [user_id, month]
+  );
+  return rows;
 };
+
+/**
+ * Category-level totals for a month.
+ */
 export const getCategoryReportModel = async (user_id, month) => {
-
-    const sql = `
-        SELECT
-            categories.name AS category_name,
-            categories.type,
-            SUM(transactions.amount) AS total
-        FROM transactions
-        JOIN categories
-            ON transactions.category_id = categories.id
-        WHERE transactions.user_id = ?
-        AND DATE_FORMAT(
-            transactions.transaction_date,
-            '%Y-%m'
-        ) = ?
-        GROUP BY categories.id, categories.name, categories.type
-        ORDER BY total DESC
-    `;
-
-    const [rows] = await db.query(sql, [
-        user_id,
-        month
-    ]);
-
-    return rows;
+  const { rows } = await pool.query(
+    `SELECT c.name  AS category_name,
+            c.type,
+            SUM(t.amount) AS total
+     FROM transactions t
+     JOIN categories c ON t.category_id = c.id
+     WHERE t.user_id = $1
+       AND to_char(t.transaction_date, 'YYYY-MM') = $2
+     GROUP BY c.id, c.name, c.type
+     ORDER BY total DESC`,
+    [user_id, month]
+  );
+  return rows;
 };

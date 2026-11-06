@@ -1,118 +1,86 @@
-import {createCategoryModel,
-        getCategoryModel,
-        getUserModelById,
-        findcategoryName,
-        checkIdExist,
-        getCategoryByIdModel,
-        checkUpdateCategoryExist,
-        updateCategoryModel,
-    deleteCategoryModel} from "../model/categoryModel.js"
+import {
+  createCategoryModel,
+  getCategoryModel,
+  getCategoryByIdModel,
+  findcategoryName,
+  checkIdExist,
+  checkUpdateCategoryExist,
+  updateCategoryModel,
+  deleteCategoryModel,
+  categoryHasTransactions,
+} from '../model/categoryModel.js';
 
-export const createCategoryService = async (data) => {
-    const { user_id, name, type } = data;
+export const createCategoryService = async ({ user_id, name, type }) => {
+  if (!name || !type) {
+    const err = new Error('name and type are required');
+    err.status = 400; throw err;
+  }
+  if (type !== 'income' && type !== 'expense') {
+    const err = new Error("type must be 'income' or 'expense'");
+    err.status = 400; throw err;
+  }
 
-    if (!user_id || !name || !type) {
-        const error = new Error("user_id, name, type are required");
-        error.status = 400;
-        throw error;
-    }
-    const isNameExist = await findcategoryName(user_id, name);
-    if(isNameExist){
-        const error = new Error("category name already exist");
-        error.status = 400;
-        throw error;
-    }
-    const category = await createCategoryModel(data);
+  const dup = await findcategoryName(user_id, name);
+  if (dup) {
+    const err = new Error('Category name already exists');
+    err.status = 409; throw err;
+  }
 
-    return category;
+  return await createCategoryModel({ user_id, name, type });
 };
 
 export const getCategoryService = async (user_id) => {
-    const checkUserId = await getUserModelById(user_id);
-
-    if (!checkUserId || checkUserId.length === 0) {
-        const error = new Error("the user not found");
-        error.status = 404;
-        throw error;
-    }
-    const getCategory = await getCategoryModel(user_id);
-
-    if (!getCategory || getCategory.length === 0) {
-        const error = new Error("the category not found");
-        error.status = 404;
-        throw error;
-    }
-    return getCategory;
+  // Always returns an array (empty is fine — no 404 for empty list)
+  return await getCategoryModel(user_id);
 };
-        // const result=await getCategoryByIdService(id)
-export const getCategoryByIdService=async(id,user_id)=>{
-    const isIdExist=await checkIdExist(id,user_id)
-    if(!isIdExist){
-        const error=Error("the category not found")
-        error.status=404
-        throw error
-    }
-    const result=await getCategoryByIdModel(id,user_id)
-    return result
-}
-export const updateCategoryService = async (id, user_id, data) => {
-    const { name, type } = data;
 
-    // 1. Validate required fields
-    if (!name || !type) {
-        const error = new Error("name and type are required");
-        error.status = 400;
-        throw error;
-    }
-
-    // 2. Validate category type
-    if (type !== "income" && type !== "expense") {
-        const error = new Error("type must be income or expense");
-        error.status = 400;
-        throw error;
-    }
-
-    // 3. Check whether the category belongs to this user
-    const isBelong = await checkIdExist(id, user_id);
-
-    if (!isBelong) {
-        const error = new Error("the category not found");
-        error.status = 404;
-        throw error;
-    }
-
-    // 4. Check whether another category has the same name
-    const isNameExist = await checkUpdateCategoryExist(
-        user_id,
-        name,
-        id
-    );
-
-    if (isNameExist) {
-        const error = new Error(
-            "the category name already exists"
-        );
-        error.status = 400;
-        throw error;
-    }
-
-    // 5. Update will be called here
-    const updatedCategory = await updateCategoryModel(
-        id,
-        user_id,
-        name,
-        type
-    );
-
-    return updatedCategory;
+export const getCategoryByIdService = async (id, user_id) => {
+  const cat = await getCategoryByIdModel(id, user_id);
+  if (!cat) {
+    const err = new Error('Category not found');
+    err.status = 404; throw err;
+  }
+  return cat;
 };
-export const deleteCategoryService=async(id,user_id)=>{
-    const checkexist=await checkIdExist(id,user_id)
-    if(!checkexist){
-    const error=Error("the category didn't find belong to this user ")
-    error.status=404
-    throw error
-    }
-    const result = await deleteCategoryModel(id,user_id)
-    return result
-}
+
+export const updateCategoryService = async (id, user_id, { name, type }) => {
+  if (!name || !type) {
+    const err = new Error('name and type are required');
+    err.status = 400; throw err;
+  }
+  if (type !== 'income' && type !== 'expense') {
+    const err = new Error("type must be 'income' or 'expense'");
+    err.status = 400; throw err;
+  }
+
+  const exists = await checkIdExist(id, user_id);
+  if (!exists) {
+    const err = new Error('Category not found');
+    err.status = 404; throw err;
+  }
+
+  const nameTaken = await checkUpdateCategoryExist(user_id, name, id);
+  if (nameTaken) {
+    const err = new Error('Category name already exists');
+    err.status = 409; throw err;
+  }
+
+  const updated = await updateCategoryModel(id, user_id, name, type);
+  return updated;
+};
+
+export const deleteCategoryService = async (id, user_id) => {
+  const exists = await checkIdExist(id, user_id);
+  if (!exists) {
+    const err = new Error('Category not found');
+    err.status = 404; throw err;
+  }
+
+  const inUse = await categoryHasTransactions(id);
+  if (inUse) {
+    const err = new Error('Category is used by transactions');
+    err.status = 409; throw err;
+  }
+
+  await deleteCategoryModel(id, user_id);
+};

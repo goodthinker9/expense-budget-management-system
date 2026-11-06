@@ -1,92 +1,53 @@
-import { createTransactionService,getTransactionService ,getTransactionServiceById,updateTransactionService,deleteTransactionService} from "../service/transactionService.js"
-export const createTransactionController=async(req,res)=>{
-    const user_id=req.user.id
-    try {
-        const result=await createTransactionService(req.body,user_id)
-        if(result){
-            res.status(200).json({
-                message:"transaction created successfully",
-                data:result
-            })
-        }
-    } catch (error) {
-        res.status(error.status || 500).json({
-            message:"error creating transaction",
-            error:error.message
-        })
-    }
-    
-}
-export const getTransactionController=async(req,res)=>{
-    const user_id=req.user.id
-    const {type,start_date,end_date}=req.query
-    try {
-        const result=await getTransactionService(user_id,type,start_date,end_date)
-        if(result){
-            res.status(200).json({
-                message:"transaction fetched successfully",
-                data:result
-            })
-        }
-    } catch (error) {
-        res.status(error.status || 500).json({
-            message:"error fetching transaction",
-            error:error.message
-        })
-    }
-}
-export const getTransactionByIdController=async(req,res)=>{
-    const user_id=req.user.id
-    const transaction_id=req.params.id
-    try {
-        const result=await getTransactionServiceById(user_id,transaction_id)
-        if(result){
-            res.status(200).json({
-                message:"transaction fetched successfully",
-                data:result
-            })
-        }
-    } catch (error) {
-        res.status(error.status || 500).json({
-            message:"error fetching transaction",
-            error:error.message
-        })
-    }
-}
-export const updateTransactionController=async(req,res)=>{
-    const user_id=req.user.id
-    const transaction_id=req.params.id
-    try {
-        const result=await updateTransactionService(user_id,transaction_id,req.body)
-        if(result){
-            res.status(200).json({
-                message:"transaction updated successfully",
-                data:result
-            })
-        }
-    } catch (error) {
-        res.status(error.status || 500).json({
-            message:"error updating transaction",
-            error:error.message
-        })
-    }
-}
-export const deleteTransactionController=async(req,res)=>{
-    const user_id=req.user.id
-    const transaction_id=req.params.id
-    try {
-        const result=await deleteTransactionService(user_id,transaction_id)
-        if(result){
-            res.status(200).json({
-                message:"transaction deleted successfully",
-                data:result
-            })
-        }
-    }catch(error){
-        res.status(error.status || 500).json({
-            message:"error deleting transaction",
-            error:error.message
-        })
-    }
-        }
+import {
+  createTransactionService,
+  getTransactionService,
+  getTransactionServiceById,
+  updateTransactionService,
+  deleteTransactionService,
+} from '../service/transactionService.js';
 
+export const createTransactionController = async (req, res) => {
+  try {
+    const data = await createTransactionService(req.body, req.user.id);
+    res.status(201).json({ message: 'Transaction created successfully.', data });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
+  }
+};
+
+export const getTransactionController = async (req, res) => {
+  try {
+    const { type, start_date, end_date } = req.query;
+    const data = await getTransactionService(req.user.id, type, start_date, end_date);
+    res.status(200).json({ message: 'Transactions fetched successfully.', data });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
+  }
+};
+
+export const getTransactionByIdController = async (req, res) => {
+  try {
+    const data = await getTransactionServiceById(req.user.id, req.params.id);
+    res.status(200).json({ message: 'Transaction fetched successfully.', data });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
+  }
+};
+
+export const updateTransactionController = async (req, res) => {
+  try {
+    const data = await updateTransactionService(req.user.id, req.params.id, req.body);
+    res.status(200).json({ message: 'Transaction updated successfully.', data });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
+  }
+};
+
+export const deleteTransactionController = async (req, res) => {
+  try {
+    await deleteTransactionService(req.user.id, req.params.id);
+    res.status(200).json({ message: 'Transaction deleted successfully.' });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
+  }
+};

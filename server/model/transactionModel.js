@@ -1,71 +1,140 @@
-import db from "../config/db.js";
-export const createTransactionModel=async(data,user_id)=>{
-    const {amount,category_id,description,transaction_date}=data
-    const sql=`INSERT INTO transactions (user_id,amount,category_id,description,transaction_date) VALUES (?,?,?,?,?)`
-    const [result] = await db.execute(sql, [user_id,amount,category_id,description,transaction_date])
-    return result.insertId
+import pool from '../config/db.js';
 
-}
-export const getTransactionModel=async(user_id)=>{
-    const sql=`SELECT t.id, t.amount, t.description, t.transaction_date, c.name AS category_name, c.type AS category_type
-                    FROM transactions t
-                    JOIN categories c ON t.category_id = c.id
-                    WHERE t.user_id = ?`
-    const [result]=await db.query(sql,[user_id])
-    return result
-}
-export const getTransactionModelById=async(user_id,transaction_id)=>{
-    const sql=`SELECT t.id, t.amount, t.description, t.transaction_date, c.name AS category_name, c.type AS category_type
-                    FROM transactions t
-                    JOIN categories c ON t.category_id = c.id
-                    WHERE t.user_id = ? AND t.id = ?`
-    const [result]=await db.query(sql,[user_id,transaction_id])
-    return result[0]
-}
-export const updateTransactionModel=async(user_id,transaction_id,data)=>{
-    const {amount,category_id,description,transaction_date}=data
-    const sql=`UPDATE transactions SET amount=?, category_id=?, description=?, transaction_date=? WHERE user_id=? AND id=?`
-    const [result]=await db.query(sql,[amount,category_id,description,transaction_date,user_id,transaction_id])
-    return result.affectedRows > 0
-}
-export const deleteTransactionModel=async(user_id,transaction_id)=>{
-    const sql=`DELETE FROM transactions WHERE user_id=? AND id=?`
-    const [result]=await db.query(sql,[user_id,transaction_id])
-    return result.affectedRows > 0
-}
-export const getTransactionByTypeModel=async(user_id,type,start_date,end_date)=>{
-    let sql = `
-        SELECT
-            transactions.id,
-            transactions.amount,
-            transactions.description,
-            transactions.transaction_date,
-            categories.name AS category_name,
-            categories.type AS category_type
-        FROM transactions
-        JOIN categories
-            ON transactions.category_id = categories.id
-        WHERE transactions.user_id = ?
-    `;
+// Common SELECT columns so every query returns the same shape.
+const TX_COLS = `
+  t.id,
+  t.amount,
+  t.description,
+  t.transaction_date,
+  t.category_id,
+  c.name  AS category_name,
+  c.type  AS category_type`;
 
-    const values = [user_id];
+/** Insert and return the new transaction with category info. */
+export const createTransactionModel = async (data, user_id) => {
+  const { amount, category_id, description, transaction_date } = data;
 
-    if (type) {
-        sql += ` AND categories.type = ?`;
-        values.push(type);
-    }
+  // Insert and get the new id in one round-trip
+  const { rows: ins } = await pool.query(
+    `INSERT INTO transactions
+       (user_id, amount, category_id, description, transaction_date)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id`,
+    [user_id, amount, category_id, description, transaction_date]
+  );
+  const newId = ins[0].id;
 
-    if (start_date && end_date) {
-        sql += ` AND transactions.transaction_date >= ?`;
-        values.push(start_date);
+  // Fetch the full row with category join
+  const { rows } = await pool.query(
+    `SELECT ${TX_COLS}
+     FROM transactions t
+     JOIN categories c ON t.category_id = c.id
+     WHERE t.id = $1`,
+    [newId]
+  );
+  return rows[0];
+};
 
-        sql += ` AND transactions.transaction_date <= ?`;
-        values.push(end_date);
-    }
+/** All transactions for a user, newest first. */
+export const getTransactionModel = async (user_id) => {
+  const { rows } = await pool.query(
+    `SELECT ${TX_COLS}
+     FROM transactions t
+     JOIN categories c ON t.category_id = c.id
+     WHERE t.user_id = $1
+     ORDER BY t.transaction_date DESC, t.id DESC`,
+    [user_id]
+  );
+  return rows;
+};
 
-    sql += ` ORDER BY transactions.transaction_date DESC`;
+/** Single transaction by id + user_id guard. */
+export const getTransactionModelById = async (user_id, transaction_id) => {
+  const { rows } = await pool.query(
+    `SELECT ${TX_COLS}
+     FROM transactions t
+     JOIN categories c ON t.category_id = c.id
+     WHERE t.user_id = $1 AND t.id = $2`,
+    [user_id, transaction_id]
+  );
+  return rows[0];
+};
 
-    const [rows] = await db.query(sql, values);
+/**
+ * Update and return the updated full row (with category info).
+ * Returns undefined if the row was not found for this user.
+ */
+export const updateTransactionModel = async (user_id, transaction_id, data) => {
+  const { amount, category_id, description, transaction_date } = data;
 
-    return rows;
+  const { rowCount } = await pool.query(
+    `UPDATE transactions
+     SET amount           = $1,
+         category_id      = $2,
+         description      = $3,
+         transaction_date = $4
+     WHERE user_id = $5 AND id = $6`,
+    [amount, category_id, description, transaction_date, user_id, transaction_id]
+  );
+
+  if (rowCount === 0) return undefined;
+
+  // Re-fetch the updated row with category join
+  const { rows } = await pool.query(
+    `SELECT ${TX_COLS}
+     FROM transactions t
+     JOIN categories c ON t.category_id = c.id
+     WHERE t.id = $1`,
+    [transaction_id]
+  );
+  return rows[0];
+};
+
+/**
+ * Delete; returns true if a row was actually deleted.
+ */
+export const deleteTransactionModel = async (user_id, transaction_id) => {
+  const { rowCount } = await pool.query(
+    'DELETE FROM transactions WHERE user_id = $1 AND id = $2',
+    [user_id, transaction_id]
+  );
+  return rowCount > 0;
+};
+
+/**
+ * Filtered query: type and/or date range are each optional independently.
+ * Orders by transaction_date DESC, id DESC.
+ */
+export const getTransactionByTypeModel = async (
+  user_id,
+  type,
+  start_date,
+  end_date
+) => {
+  const values = [user_id];
+  let sql = `
+    SELECT ${TX_COLS}
+    FROM transactions t
+    JOIN categories c ON t.category_id = c.id
+    WHERE t.user_id = $1`;
+
+  if (type) {
+    values.push(type);
+    sql += ` AND c.type = $${values.length}`;
+  }
+
+  if (start_date) {
+    values.push(start_date);
+    sql += ` AND t.transaction_date >= $${values.length}`;
+  }
+
+  if (end_date) {
+    values.push(end_date);
+    sql += ` AND t.transaction_date <= $${values.length}`;
+  }
+
+  sql += ` ORDER BY t.transaction_date DESC, t.id DESC`;
+
+  const { rows } = await pool.query(sql, values);
+  return rows;
 };

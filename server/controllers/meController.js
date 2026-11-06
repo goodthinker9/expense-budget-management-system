@@ -1,32 +1,32 @@
-import {getAllUserService,getUserServiceById} from "../service/meService.js"
-export const getMeController=async(req,res)=>{
-    const userId=req.user.id
-    try {
-        const user=await getAllUserService(userId)
-        if(user){
-            res.status(200).json({
-            message:"user data fetched successfully",
-            data:user
-        })
-        }
-        
-    } catch (error) {
-        res.status(error.status || 500).json({message:error.message || "internal server error"})
-    }
-}
-export const getMeControllerById=async(req,res)=>{
-    try {
-        const user=await getUserServiceById(req.params.id)
-        if(user){
-            res.status(200).json({
-                message:"user data fetched successfully",
-                data:user
-            })
-        }else{
-            res.status(404).json({message:"user not found"})
-            }
-        }
-    catch (error) {
-        res.status(error.status || 500).json({message:error.message || "internal server error"})
-    }
-}
+import {
+  getMeService,
+  updateMeService,
+  changePasswordService,
+} from '../service/meService.js';
+
+export const getMeController = async (req, res) => {
+  try {
+    const user = await getMeService(req.user.id);
+    res.status(200).json({ message: 'User fetched successfully.', data: user });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
+  }
+};
+
+export const updateMeController = async (req, res) => {
+  try {
+    const user = await updateMeService(req.user.id, req.body);
+    res.status(200).json({ message: 'Profile updated successfully.', data: user });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
+  }
+};
+
+export const changePasswordController = async (req, res) => {
+  try {
+    await changePasswordService(req.user.id, req.body);
+    res.status(200).json({ message: 'Password changed successfully.' });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
+  }
+};

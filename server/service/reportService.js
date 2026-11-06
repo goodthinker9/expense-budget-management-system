@@ -1,122 +1,65 @@
-import {getReportModel,getCategoryReportModel } from "../model/reportModel.js";
+import { getReportModel, getCategoryReportModel } from '../model/reportModel.js';
 
-export const getReportService = async (user_id, month) => {
+const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 
-    if (!month) {
-        const error = new Error("month is required");
-        error.status = 400;
-        throw error;
-    }
+/** Returns the current month as 'YYYY-MM'. */
+function currentMonth() {
+  const now = new Date();
+  const mm  = String(now.getMonth() + 1).padStart(2, '0');
+  return `${now.getFullYear()}-${mm}`;
+}
 
-    const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
+function resolveMonth(month) {
+  if (!month) return currentMonth();
+  if (!MONTH_RE.test(month)) {
+    const err = new Error('month must be in YYYY-MM format');
+    err.status = 400; throw err;
+  }
+  return month;
+}
 
-    if (!monthPattern.test(month)) {
-        const error = new Error(
-            "month must be in YYYY-MM format"
-        );
+export const getReportService = async (user_id, rawMonth) => {
+  const month = resolveMonth(rawMonth);
 
-        error.status = 400;
-        throw error;
-    }
+  const rows = await getReportModel(user_id, month);
 
-    const rows = await getReportModel(
-        user_id,
-        month
-    );
+  let income = 0;
+  let expense = 0;
+  rows.forEach((r) => {
+    if (r.type === 'income')  income  = Number(r.total);
+    if (r.type === 'expense') expense = Number(r.total);
+  });
 
-    let income = 0;
-    let expense = 0;
-
-    rows.forEach((row) => {
-
-        if (row.type === "income") {
-            income = Number(row.total);
-        }
-
-        if (row.type === "expense") {
-            expense = Number(row.total);
-        }
-
-    });
-
-    const balance = income - expense;
-
-    return {
-        month,
-        income,
-        expense,
-        balance
-    };
+  return { month, income, expense, balance: income - expense };
 };
-export const getCategoryReportService = async (user_id, month) => {
 
-    if (!month) {
-        const error = new Error("month is required");
-        error.status = 400;
-        throw error;
-    }
+export const getCategoryReportService = async (user_id, rawMonth) => {
+  const month = resolveMonth(rawMonth);
 
-    const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
+  const rows = await getCategoryReportModel(user_id, month);
 
-    if (!monthPattern.test(month)) {
-        const error = new Error(
-            "month must be in YYYY-MM format"
-        );
+  const categories = rows.map((r) => ({
+    category_name: r.category_name,
+    type:  r.type,
+    total: Number(r.total),
+  }));
 
-        error.status = 400;
-        throw error;
-    }
-
-    const rows = await getCategoryReportModel(
-        user_id,
-        month
-    );
-
-    const categories = rows.map((row) => ({
-        category_name: row.category_name,
-        type: row.type,
-        total: Number(row.total)
-    }));
-
-    return {
-        month,
-        categories
-    };
+  return { month, categories };
 };
-export const getDashboardReportService = async (user_id, month) => {
 
-    if (!month) {
-        const error = new Error("month is required");
-        error.status = 400;
-        throw error;
-    }
+export const getDashboardReportService = async (user_id, rawMonth) => {
+  const month = resolveMonth(rawMonth);
 
-    const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
+  const [monthly, catReport] = await Promise.all([
+    getReportService(user_id, month),
+    getCategoryReportService(user_id, month),
+  ]);
 
-    if (!monthPattern.test(month)) {
-        const error = new Error(
-            "month must be in YYYY-MM format"
-        );
-
-        error.status = 400;
-        throw error;
-    }
-
-    const monthlyReport = await getReportService(
-        user_id,
-        month
-    );
-
-    const categoryReport = await getCategoryReportService(
-        user_id,
-        month
-    );
-
-    return {
-        month,
-        income: monthlyReport.income,
-        expense: monthlyReport.expense,
-        balance: monthlyReport.balance,
-        categories: categoryReport.categories
-    };
+  return {
+    month,
+    income:     monthly.income,
+    expense:    monthly.expense,
+    balance:    monthly.balance,
+    categories: catReport.categories,
+  };
 };

@@ -1,7 +1,7 @@
 /**
  * mockApi.js — In-memory mock API with localStorage persistence.
  *
- * Implements exactly the same endpoint contract the real backend will use:
+ * Implements exactly the same endpoint contract as the real backend:
  *
  *  AUTH
  *    POST /api/auth/register   body: { name, email, password }
@@ -17,7 +17,7 @@
  *  CATEGORIES
  *    GET    /api/category          → { message, result: [category] }
  *    GET    /api/category/:id      → { message, result: category }
- *    POST   /api/category          body: { name, type }  → { message, result: category }
+ *    POST   /api/category          body: { name, type }  → 201 { message, result: category }
  *    PUT    /api/category/:id      body: { name, type }  → { message, result: category }
  *    DELETE /api/category/:id      → { message }
  *
@@ -26,23 +26,36 @@
  *                              → { message, data: [transaction] }
  *    GET    /api/transaction/:id   → { message, data: transaction }
  *    POST   /api/transaction   body: { category_id, amount, description, transaction_date }
- *                              → { message, data: transaction }
+ *                              → 201 { message, data: transaction }
  *    PUT    /api/transaction/:id   body: same  → { message, data: transaction }
  *    DELETE /api/transaction/:id   → { message }
  *
- *  REPORTS
- *    GET /api/reports/monthly?month=YYYY-MM
- *                              → { message, result: [{ type, total }] }
- *    GET /api/reports/category?month=YYYY-MM
- *                              → { message, result: [{ category_name, type, total }] }
+ *    transaction shape: { id, amount, description, transaction_date,
+ *                         category_id, category_name, category_type }
  *
- *  BUDGETS  (shape documented for the real backend)
+ *  REPORTS  (month defaults to current month when omitted; YYYY-MM required)
+ *    GET /api/reports/monthly?month=YYYY-MM
+ *                              → { message, result: { month, income, expense, balance } }
+ *    GET /api/reports/category?month=YYYY-MM
+ *                              → { message, result: { month, categories: [{ category_name, type, total }] } }
+ *    GET /api/reports/dashboard?month=YYYY-MM
+ *                              → { message, result: { month, income, expense, balance,
+ *                                                      categories: [{ category_name, type, total }] } }
+ *
+ *  BUDGETS
  *    Budget object: { id, category_id, category_name, month (YYYY-MM), limit_amount, spent }
+ *    spent = SUM of that user's transactions in that category for that month (0 if none).
+ *
  *    GET    /api/budget?month=YYYY-MM  → { message, result: [budget] }
- *    POST   /api/budget         body: { category_id, month, limit_amount }
- *                              → { message, result: budget }
- *    PUT    /api/budget/:id     body: { limit_amount }  → { message, result: budget }
- *    DELETE /api/budget/:id     → { message }
+ *                                        (month defaults to current month; invalid format → 400)
+ *    POST   /api/budget   body: { category_id, month, limit_amount }
+ *                              → 201 { message, result: budget }
+ *                                 409 if duplicate (same category + month)
+ *                                 400 if category is not 'expense' type
+ *                                 404 if category not found
+ *    PUT    /api/budget/:id   body: { limit_amount }
+ *                              → { message, result: budget }  (404 if not found)
+ *    DELETE /api/budget/:id   → { message }  (404 if not found)
  */
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -456,28 +469,36 @@ export async function handleMockRequest(config) {
 
   // ── REPORTS ───────────────────────────────────────────────────────────────
 
-  if (method === 'get' && path === '/api/reports/monthly') {
-    const user = getCurrentUser(token);
-    if (!user) throw mockError(401, 'Unauthorized.');
-    const month = params.month; // YYYY-MM
-    if (!month) throw mockError(400, 'month parameter required.');
+  // ── shared report helpers ──────────────────────────────────────────────────
+
+  const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
+
+  function resolveMonth(raw) {
+    if (!raw) {
+      // Default to current month
+      const now = new Date();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      return `${now.getFullYear()}-${mm}`;
+    }
+    if (!MONTH_RE.test(raw)) throw mockError(400, 'month must be in YYYY-MM format');
+    return raw;
+  }
+
+  function computeMonthly(user, month) {
     const all = (load(KEYS.transactions) || []).filter(
       (t) => t.user_id === user.id && t.transaction_date.startsWith(month)
     );
     const totals = { income: 0, expense: 0 };
     all.forEach((t) => { totals[t.category_type] += Number(t.amount); });
-    const result = [
-      { type: 'income',  total: totals.income  },
-      { type: 'expense', total: totals.expense },
-    ];
-    return { data: { message: 'Monthly report fetched.', result }, status: 200 };
+    return {
+      month,
+      income:  totals.income,
+      expense: totals.expense,
+      balance: totals.income - totals.expense,
+    };
   }
 
-  if (method === 'get' && path === '/api/reports/category') {
-    const user = getCurrentUser(token);
-    if (!user) throw mockError(401, 'Unauthorized.');
-    const month = params.month;
-    if (!month) throw mockError(400, 'month parameter required.');
+  function computeCategories(user, month) {
     const all = (load(KEYS.transactions) || []).filter(
       (t) => t.user_id === user.id && t.transaction_date.startsWith(month)
     );
@@ -487,27 +508,58 @@ export async function handleMockRequest(config) {
       if (!map[key]) map[key] = { category_name: t.category_name, type: t.category_type, total: 0 };
       map[key].total += Number(t.amount);
     });
-    const result = Object.values(map).sort((a, b) => b.total - a.total);
+    return Object.values(map).sort((a, b) => b.total - a.total);
+  }
+
+  if (method === 'get' && path === '/api/reports/monthly') {
+    const user = getCurrentUser(token);
+    if (!user) throw mockError(401, 'Unauthorized.');
+    const month = resolveMonth(params.month);
+    const result = computeMonthly(user, month);
+    return { data: { message: 'Monthly report fetched.', result }, status: 200 };
+  }
+
+  if (method === 'get' && path === '/api/reports/category') {
+    const user = getCurrentUser(token);
+    if (!user) throw mockError(401, 'Unauthorized.');
+    const month = resolveMonth(params.month);
+    const categories = computeCategories(user, month);
+    const result = { month, categories };
     return { data: { message: 'Category report fetched.', result }, status: 200 };
+  }
+
+  if (method === 'get' && path === '/api/reports/dashboard') {
+    const user = getCurrentUser(token);
+    if (!user) throw mockError(401, 'Unauthorized.');
+    const month = resolveMonth(params.month);
+    const monthly    = computeMonthly(user, month);
+    const categories = computeCategories(user, month);
+    const result = { ...monthly, categories };
+    return { data: { message: 'Dashboard report fetched.', result }, status: 200 };
   }
 
   // ── BUDGETS ───────────────────────────────────────────────────────────────
 
+  // Helper: compute spent for one budget entry
+  function budgetWithSpent(b, user) {
+    const txAll = (load(KEYS.transactions) || []).filter((t) => t.user_id === user.id);
+    const spent = txAll
+      .filter((t) => t.category_id === b.category_id && t.transaction_date.startsWith(b.month))
+      .reduce((s, t) => s + Number(t.amount), 0);
+    return { ...b, spent };
+  }
+
   if (method === 'get' && path === '/api/budget') {
     const user = getCurrentUser(token);
     if (!user) throw mockError(401, 'Unauthorized.');
-    const month = params.month;
-    let all = (load(KEYS.budgets) || []).filter((b) => b.user_id === user.id);
-    if (month) all = all.filter((b) => b.month === month);
 
-    // Compute spent from transactions
-    const txAll = (load(KEYS.transactions) || []).filter((t) => t.user_id === user.id);
-    const result = all.map((b) => {
-      const spent = txAll
-        .filter((t) => t.category_id === b.category_id && t.transaction_date.startsWith(b.month))
-        .reduce((s, t) => s + Number(t.amount), 0);
-      return { ...b, spent };
-    });
+    // Default to current month; validate format if provided
+    const month = resolveMonth(params.month);
+
+    const all = (load(KEYS.budgets) || []).filter(
+      (b) => b.user_id === user.id && b.month === month
+    );
+    const result = all.map((b) => budgetWithSpent(b, user));
     return { data: { message: 'Budgets fetched.', result }, status: 200 };
   }
 
@@ -516,17 +568,21 @@ export async function handleMockRequest(config) {
     if (!user) throw mockError(401, 'Unauthorized.');
     if (!body.category_id) throw mockError(400, 'category_id required.');
     if (!body.month) throw mockError(400, 'month required.');
-    if (!body.limit_amount || Number(body.limit_amount) <= 0) throw mockError(400, 'limit_amount must be positive.');
+    if (!MONTH_RE.test(body.month)) throw mockError(400, 'month must be in YYYY-MM format');
+    if (!body.limit_amount || Number(body.limit_amount) <= 0)
+      throw mockError(400, 'limit_amount must be positive.');
 
     const cats = load(KEYS.categories) || [];
     const cat = cats.find((c) => c.id === body.category_id && c.user_id === user.id);
     if (!cat) throw mockError(404, 'Category not found.');
-    if (cat.type !== 'expense') throw mockError(400, 'Budgets can only be set for expense categories.');
+    if (cat.type !== 'expense')
+      throw mockError(400, 'Budgets can only be set for expense categories.');
 
     const all = load(KEYS.budgets) || [];
-    // Prevent duplicates for same category+month
-    const dup = all.find((b) => b.category_id === body.category_id && b.month === body.month && b.user_id === user.id);
-    if (dup) throw mockError(409, 'Budget already exists for this category and month.');
+    const dup = all.find(
+      (b) => b.category_id === body.category_id && b.month === body.month && b.user_id === user.id
+    );
+    if (dup) throw mockError(409, 'Budget already exists for this category and month');
 
     const budget = {
       id: uid(),
@@ -537,7 +593,8 @@ export async function handleMockRequest(config) {
       limit_amount: Number(body.limit_amount),
     };
     save(KEYS.budgets, [...all, budget]);
-    return { data: { message: 'Budget created.', result: { ...budget, spent: 0 } }, status: 201 };
+    const result = budgetWithSpent(budget, user);
+    return { data: { message: 'Budget created.', result }, status: 201 };
   }
 
   if (method === 'put' && /^\/api\/budget\/[^/]+$/.test(path)) {
@@ -547,9 +604,13 @@ export async function handleMockRequest(config) {
     const all = load(KEYS.budgets) || [];
     const idx = all.findIndex((b) => b.id === id && b.user_id === user.id);
     if (idx === -1) throw mockError(404, 'Budget not found.');
+    if (!body.limit_amount || Number(body.limit_amount) <= 0)
+      throw mockError(400, 'limit_amount must be positive.');
     all[idx] = { ...all[idx], limit_amount: Number(body.limit_amount) };
     save(KEYS.budgets, all);
-    return { data: { message: 'Budget updated.', result: all[idx] }, status: 200 };
+    // Return with spent recomputed
+    const result = budgetWithSpent(all[idx], user);
+    return { data: { message: 'Budget updated.', result }, status: 200 };
   }
 
   if (method === 'delete' && /^\/api\/budget\/[^/]+$/.test(path)) {
@@ -557,7 +618,8 @@ export async function handleMockRequest(config) {
     if (!user) throw mockError(401, 'Unauthorized.');
     const id = path.split('/').pop();
     const all = load(KEYS.budgets) || [];
-    if (!all.find((b) => b.id === id && b.user_id === user.id)) throw mockError(404, 'Budget not found.');
+    if (!all.find((b) => b.id === id && b.user_id === user.id))
+      throw mockError(404, 'Budget not found.');
     save(KEYS.budgets, all.filter((b) => b.id !== id));
     return { data: { message: 'Budget deleted.' }, status: 200 };
   }

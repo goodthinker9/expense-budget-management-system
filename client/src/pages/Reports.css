@@ -1,0 +1,296 @@
+/* =============================================
+   Reports Page
+   ============================================= */
+
+.reports-page {
+  padding: 1.75rem 2rem;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Header ── */
+.rpt-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rpt-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* reuse month-picker from Dashboard */
+.month-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+}
+
+.month-input {
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: #374151;
+  background: transparent;
+  cursor: pointer;
+}
+
+.month-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.rpt-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+}
+
+/* ── Summary Cards ── */
+.rpt-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.rpt-card {
+  background: white;
+  border-radius: 14px;
+  border: 1.5px solid #e5e7eb;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.rpt-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.07);
+}
+
+.rpt-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rpt-card--income  .rpt-card-icon { background: #ecfdf5; }
+.rpt-card--expense .rpt-card-icon { background: #fef2f2; }
+.rpt-card--balance .rpt-card-icon { background: #eff6ff; }
+.rpt-card--balance.negative .rpt-card-icon { background: #fef2f2; }
+
+.rpt-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.rpt-card-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rpt-card-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rpt-card--balance.negative .rpt-card-value { color: #ef4444; }
+
+/* ── Error ── */
+.rpt-error {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  color: #991b1b;
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+
+/* ── Table card ── */
+.rpt-table-card {
+  min-height: 200px;
+}
+
+.rpt-row-count {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* ── Skeleton ── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.rpt-skeleton {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  display: inline-block;
+}
+
+.rpt-table-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.rpt-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.rpt-skeleton-row.header {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* ── Table ── */
+.rpt-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.rpt-table colgroup col:nth-child(1) { width: 28%; }
+.rpt-table colgroup col:nth-child(2) { width: 12%; }
+.rpt-table colgroup col:nth-child(3) { width: 20%; }
+.rpt-table colgroup col:nth-child(4) { width: 10%; }
+.rpt-table colgroup col:nth-child(5) { width: 30%; }
+
+/* group header row */
+.rpt-group-header td {
+  background: #f9fafb;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rpt-group-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.rpt-group-label.income  { background: #d1fae5; color: #065f46; }
+.rpt-group-label.expense { background: #fee2e2; color: #991b1b; }
+
+/* value cells */
+.rpt-cat-name  { font-weight: 500; color: #111827; font-size: 0.875rem; }
+.rpt-num-col   { text-align: right; }
+.rpt-income    { color: #059669; font-weight: 600; font-size: 0.875rem; }
+.rpt-expense   { color: #ef4444; font-weight: 600; font-size: 0.875rem; }
+.rpt-pct       { color: #6b7280; font-size: 0.8rem; }
+
+/* inline bar */
+.rpt-bar-col { padding: 0.875rem 1rem; }
+
+.rpt-inline-track {
+  height: 6px;
+  background: #f3f4f6;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.rpt-inline-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.rpt-inline-fill.income  { background: #10b981; }
+.rpt-inline-fill.expense { background: #e8572a; }
+
+/* footer rows */
+.rpt-totals-row,
+.rpt-balance-row {
+  background: #f9fafb;
+}
+
+.rpt-totals-row td,
+.rpt-balance-row td {
+  border-top: 2px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+}
+
+.rpt-totals-label {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.rpt-total-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+  font-size: 0.8rem;
+}
+
+.rpt-balance-val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2563eb;
+  text-align: right;
+}
+
+.rpt-balance-val.negative { color: #ef4444; }
+
+/* ── btn-sm (shared) ── */
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .rpt-cards { grid-template-columns: 1fr 1fr; }
+  .rpt-table { font-size: 0.8rem; }
+  .rpt-bar-col { display: none; } /* hide bar column on small screens */
+}
+
+@media (max-width: 500px) {
+  .reports-page { padding: 1rem; }
+  .rpt-cards { grid-template-columns: 1fr; }
+  .rpt-header { flex-direction: column; align-items: flex-start; }
+  .rpt-header-right { width: 100%; justify-content: space-between; }
+}

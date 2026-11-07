@@ -1,14 +1,16 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import AuthContext from '../context/AuthContext';
-import { IconDashboard, IconTransactions, IconCategory, IconUser, IconLogout } from './Icons';
+import { IconDashboard, IconTransactions, IconCategory, IconReports, IconBudget, IconUser, IconLogout } from './Icons';
 import './Sidebar.css';
 
 const navItems = [
-  { to: '/dashboard', label: 'Dashboard', Icon: IconDashboard },
-  { to: '/transaction', label: 'Transactions', Icon: IconTransactions },
-  { to: '/category', label: 'Categories', Icon: IconCategory },
-  { to: '/profile', label: 'Profile', Icon: IconUser },
+  { to: '/dashboard',   label: 'Dashboard',    Icon: IconDashboard    },
+  { to: '/transaction', label: 'Transactions',  Icon: IconTransactions },
+  { to: '/category',    label: 'Categories',    Icon: IconCategory     },
+  { to: '/reports',     label: 'Reports',       Icon: IconReports      },
+  { to: '/budgets',     label: 'Budgets',       Icon: IconBudget       },
+  { to: '/profile',     label: 'Profile',       Icon: IconUser         },
 ];
 
 function Sidebar() {

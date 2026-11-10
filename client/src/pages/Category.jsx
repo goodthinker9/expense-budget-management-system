@@ -1,23 +1,28 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../services/app.js';
+import {
+  IconEdit, IconTrash, IconFolder, IconBriefcase,
+  IconChart, IconTrendUp, IconTrendDown, IconCategory,
+} from '../components/Icons';
 import './Category.css';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 const EMPTY_FORM = { name: '', type: 'expense' };
 
-const KEYWORD_ICONS = {
-  food: '🍽️', transport: '🚗', shopping: '🛍️', health: '🏥',
-  entertainment: '🎬', education: '📚', salary: '💼', business: '🏢',
-  investment: '📈', rent: '🏠', utilities: '💡',
-};
+/** Map keyword → icon component (rendered at call site with consistent props) */
+const KEYWORD_ICON_MAP = [
+  { keys: ['salary', 'income', 'business', 'freelance'], Icon: IconBriefcase },
+  { keys: ['investment', 'stock', 'chart'],              Icon: IconChart },
+  { keys: ['transport', 'travel', 'car'],                Icon: IconFolder },
+];
 
-function getCategoryIcon(name = '') {
+function getCategoryIconComponent(name = '', size = 18, color = 'currentColor') {
   const lower = name.toLowerCase();
-  for (const [key, icon] of Object.entries(KEYWORD_ICONS)) {
-    if (lower.includes(key)) return icon;
+  for (const { keys, Icon } of KEYWORD_ICON_MAP) {
+    if (keys.some((k) => lower.includes(k))) return <Icon size={size} color={color} />;
   }
-  return '📁';
+  return <IconFolder size={size} color={color} />;
 }
 
 // ── modal with Escape support ────────────────────────────────────────────────
@@ -171,10 +176,10 @@ function Category() {
       {/* Filter pills */}
       <div className="cat-stats">
         {[
-          { key: 'all',     label: 'All',     icon: '📁', count: categories.length },
-          { key: 'income',  label: 'Income',  icon: '📈', count: incomeCount },
-          { key: 'expense', label: 'Expense', icon: '📉', count: expenseCount },
-        ].map(({ key, label, icon, count }) => (
+          { key: 'all',     label: 'All',     Icon: IconCategory,  count: categories.length },
+          { key: 'income',  label: 'Income',  Icon: IconTrendUp,   count: incomeCount },
+          { key: 'expense', label: 'Expense', Icon: IconTrendDown,  count: expenseCount },
+        ].map(({ key, label, Icon, count }) => (
           <div
             key={key}
             className={`cat-stat-pill ${key !== 'all' ? key : ''} ${filterType === key ? 'active' : ''}`}
@@ -183,7 +188,7 @@ function Category() {
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && setFilterType(key)}
           >
-            <span>{icon}</span>
+            <Icon size={15} color="currentColor" />
             <span>{label}</span>
             <span className="cat-stat-count">{count}</span>
           </div>
@@ -211,7 +216,10 @@ function Category() {
         <div className="cat-grid">
           {filtered.map((cat) => (
             <div key={cat.id} className={`cat-card cat-card--${cat.type}`}>
-              <div className="cat-card-icon">{getCategoryIcon(cat.name)}</div>
+              <div className="cat-card-icon">
+                {getCategoryIconComponent(cat.name, 20,
+                  cat.type === 'income' ? '#059669' : '#e8572a')}
+              </div>
               <div className="cat-card-body">
                 <span className="cat-card-name">{cat.name}</span>
                 <span
@@ -228,14 +236,14 @@ function Category() {
                   onClick={() => openEdit(cat)}
                   aria-label={`Edit ${cat.name}`}
                 >
-                  ✏️
+                  <IconEdit size={16} color="currentColor" />
                 </button>
                 <button
                   className="cat-action delete"
                   onClick={() => { setDeleteError(null); setDeleteId(cat.id); }}
                   aria-label={`Delete ${cat.name}`}
                 >
-                  🗑️
+                  <IconTrash size={16} color="currentColor" />
                 </button>
               </div>
             </div>
@@ -260,7 +268,9 @@ function Category() {
                     className={`type-toggle-btn ${form.type === t ? `active-${t}` : ''}`}
                     onClick={() => setForm((prev) => ({ ...prev, type: t }))}
                   >
-                    {t === 'income' ? '📈 Income' : '📉 Expense'}
+                    {t === 'income'
+                      ? <><IconTrendUp size={14} color="currentColor" style={{ marginRight: 4 }} /> Income</>
+                      : <><IconTrendDown size={14} color="currentColor" style={{ marginRight: 4 }} /> Expense</>}
                   </button>
                 ))}
               </div>
@@ -283,7 +293,10 @@ function Category() {
 
             {form.name && (
               <div className="cat-preview">
-                <span className="cat-preview-icon">{getCategoryIcon(form.name)}</span>
+                <span className="cat-preview-icon">
+                  {getCategoryIconComponent(form.name, 20,
+                    form.type === 'income' ? '#059669' : '#e8572a')}
+                </span>
                 <div>
                   <span className="cat-preview-name">{form.name}</span>
                   <span

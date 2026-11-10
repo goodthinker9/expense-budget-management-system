@@ -2,7 +2,10 @@
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { login } from '../services/authService.js';
 import AuthContext from '../context/AuthContext.jsx';
-import { IconMail, IconLock, IconEye, IconEyeOff } from '../components/Icons';
+import {
+  IconMail, IconLock, IconEye, IconEyeOff,
+  IconTrendUp, IconTarget, IconWallet,
+} from '../components/Icons';
 import './Auth.css';
 
 function Login() {
@@ -52,10 +55,6 @@ function Login() {
   return (
     <div className="auth-page">
       <div className="auth-left">
-        <video className="auth-video" autoPlay muted loop playsInline poster="/image/image.png">
-          <source src="https://videos.pexels.com/video-files/6326935/6326935-hd_1920_1080_25fps.mp4" type="video/mp4" />
-        </video>
-        <div className="auth-left-overlay" />
         <div className="auth-left-content">
           <Link to="/" className="auth-logo">
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
@@ -69,6 +68,20 @@ function Login() {
             <h2>Track Every Birr.<br />Build Every Dream.</h2>
             <p>Join thousands of Ethiopians managing their finances smarter with FinTrackET.</p>
           </div>
+          <ul className="auth-features">
+            <li>
+              <span className="auth-feature-icon"><IconTrendUp size={18} color="#e8572a" /></span>
+              Track every expense automatically
+            </li>
+            <li>
+              <span className="auth-feature-icon"><IconTarget size={18} color="#e8572a" /></span>
+              Set monthly budgets and stay on track
+            </li>
+            <li>
+              <span className="auth-feature-icon"><IconWallet size={18} color="#e8572a" /></span>
+              See where your money goes at a glance
+            </li>
+          </ul>
         </div>
       </div>
 

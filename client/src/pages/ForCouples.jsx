@@ -23,11 +23,6 @@ export default function ForCouples() {
 
       {/* ── HERO ── */}
       <section className="mp-hero">
-        <video className="mp-hero-video" autoPlay muted loop playsInline poster="/image/image.png">
-          {/* Free Pexels video: Couple with laptop discussing finances */}
-          <source src="https://videos.pexels.com/video-files/7735813/7735813-hd_1920_1080_25fps.mp4" type="video/mp4" />
-        </video>
-        <div className="mp-hero-overlay" />
         <div className="mp-hero-content mp-inner">
           <div className="mp-hero-text">
             <p className="mp-eyebrow">FOR COUPLES</p>

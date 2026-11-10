@@ -66,7 +66,7 @@ function Login() {
           </Link>
           <div className="auth-tagline">
             <h2>Track Every Birr.<br />Build Every Dream.</h2>
-            <p>Join thousands of Ethiopians managing their finances smarter with FinTrackET.</p>
+            <p>Manage your money smarter with FinTrackET.</p>
           </div>
           <ul className="auth-features">
             <li>

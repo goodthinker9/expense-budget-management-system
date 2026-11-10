@@ -27,11 +27,6 @@ export default function ForProfessionals() {
 
       {/* ── HERO ── */}
       <section className="mp-hero">
-        <video className="mp-hero-video" autoPlay muted loop playsInline poster="/image/image.png">
-          {/* Free Pexels video: Professional finance meeting */}
-          <source src="https://videos.pexels.com/video-files/6699609/6699609-hd_1920_1080_25fps.mp4" type="video/mp4" />
-        </video>
-        <div className="mp-hero-overlay" />
         <div className="mp-hero-content mp-inner">
           <div className="mp-hero-text">
             <p className="mp-eyebrow">FOR PROFESSIONALS</p>

@@ -30,24 +30,6 @@ export default function Home() {
 
       {/* ── HERO ── */}
       <section className="hp-hero">
-        {/* Background video - autoplay, muted, looping like Monarch */}
-        <video
-          className="hp-hero-video"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/image/image.png"
-        >
-          {/*
-            Free Pexels video #7735813: Couple discussing finances with laptop and cash
-            License: Free to use, no attribution required (Pexels license)
-          */}
-          <source src="https://videos.pexels.com/video-files/7735813/7735813-hd_1920_1080_25fps.mp4" type="video/mp4" />
-          <source src="https://videos.pexels.com/video-files/3943964/3943964-hd_1920_1080_25fps.mp4" type="video/mp4" />
-          {/* Static fallback */}
-          <img src="/image/image.png" alt="FinTrackET" className="hp-hero-bg" />
-        </video>
         <div className="hp-hero-overlay" />
         <div className="hp-hero-content">
           <p className="hp-hero-eyebrow">THE MODERN WAY</p>

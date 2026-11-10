@@ -55,28 +55,43 @@
   align-items: flex-end;
   overflow: hidden;
   padding-top: 60px;
+  /* CSS-only gradient background — no external media */
+  background:
+    linear-gradient(
+      150deg,
+      #0d0a08 0%,
+      #1e1008 20%,
+      #1a1a18 55%,
+      #0a1414 100%
+    );
 }
 
-.mp-hero-bg {
+/* Soft orange radial glow */
+.mp-hero::before {
+  content: '';
   position: absolute;
-  inset: 0;
-  width: 100%;
+  top: -20%;
+  left: -10%;
+  width: 60%;
   height: 100%;
-  object-fit: cover;
-  object-position: center;
-  opacity: 0.4;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,87,42,0.20) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.mp-hero-overlay {
+/* Subtle teal counter-glow */
+.mp-hero::after {
+  content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to right,
-    rgba(26, 26, 24, 0.95) 0%,
-    rgba(26, 26, 24, 0.7) 60%,
-    rgba(26, 26, 24, 0.2) 100%
-  );
-  z-index: 1;
+  bottom: -15%;
+  right: -5%;
+  width: 45%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .mp-hero-content {
@@ -232,16 +247,6 @@
 /* Sidebar items */
 .mp-sidebar-item { font-size: 0.8rem; color: #6b7280; padding: 0.4rem 0; border-bottom: 1px solid #f9fafb; }
 .mp-sidebar-item:first-of-type { color: #111827; font-weight: 600; }
-
-.mp-hero-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  opacity: 0.45;
-}
 
 /* Feature image - only used where truly needed */
 .mp-feature-img {

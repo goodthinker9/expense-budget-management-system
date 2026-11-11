@@ -13,6 +13,15 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 dotenv.config();
 
+// ── Production guard ──────────────────────────────────────────────────────────
+if (process.env.NODE_ENV === 'production' && process.env.ALLOW_SEED !== 'true') {
+  console.error(
+    'Refusing to seed a production database.\n' +
+    'Set ALLOW_SEED=true if you really mean it (not recommended).'
+  );
+  process.exit(1);
+}
+
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 async function upsertUser({ name, email, password }) {

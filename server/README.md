@@ -4,6 +4,36 @@ Express 5 REST API backed by Supabase PostgreSQL.
 
 ---
 
+## Security
+
+The following hardening measures are in place:
+
+| Measure | Detail |
+|---|---|
+| **HTTP security headers** | `helmet` sets `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`, removes `X-Powered-By`, and more. |
+| **Rate limiting** | `express-rate-limit` with `standardHeaders: true`. Auth endpoints (login/register): 10 req / 15 min. Change-password: 5 req / 15 min. All `/api` routes: 300 req / 15 min. Returns 429 `{ message: "Too many attempts, please try again later." }`. |
+| **Proxy trust** | `app.set('trust proxy', 1)` so rate limiting sees client IPs behind Render/Railway. |
+| **Body size limit** | `express.json({ limit: '10kb' })` — oversized bodies return 413, never a stack trace. |
+| **CORS** | Only origins listed in `CLIENT_ORIGIN` (comma-separated) are allowed. No-Origin requests (curl, health checks) are permitted. |
+| **Startup checks** | Server refuses to start if `DATABASE_URL` or `JWT_SECRET` is missing; refuses if `NODE_ENV=production` and `JWT_SECRET` is shorter than 32 chars. |
+| **Health endpoint** | `GET /health` → `200 { status: "ok" }` with no DB hit, no auth, before all other middleware. |
+| **Database SSL** | If `DB_SSL_CA` is set the PG pool verifies the server certificate (`rejectUnauthorized: true`). Without it, verification is skipped and a warning is logged in production. |
+| **Input hygiene** | Email is trimmed and lowercased on register, login, and profile update. Email format is validated (400 `"Invalid email address"`). Name is 1–100 chars. Password is 6–72 chars (bcrypt silently ignores bytes after 72). |
+| **Constant-time login** | Unknown email and wrong password return identical `401 "Invalid email or password"` messages to prevent user enumeration. |
+| **Seed guard** | `seed.js` exits with code 1 when `NODE_ENV=production` unless `ALLOW_SEED=true` is explicitly set. |
+
+### Security-related environment variables
+
+| Variable | Description |
+|---|---|
+| `NODE_ENV` | Set to `production` in deployed environments. Enables JWT length check, DB SSL warning, and seed guard. |
+| `CLIENT_ORIGIN` | Comma-separated list of allowed CORS origins, e.g. `https://app.example.com,https://www.example.com` |
+| `DISABLE_RATE_LIMIT` | Set `true` during local testing to bypass all rate limiters. Never use in production. |
+| `DB_SSL_CA` | PEM text of Supabase's root CA certificate (download from Supabase → Database → Settings → SSL configuration). Escaped newlines (`\n`) are accepted. |
+| `ALLOW_SEED` | Set `true` to allow `npm run seed` when `NODE_ENV=production`. Not recommended. |
+
+---
+
 ## Stack
 
 - **Runtime:** Node.js (ES modules)

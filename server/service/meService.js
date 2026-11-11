@@ -7,6 +7,8 @@ import {
 } from '../model/meModel.js';
 import bcrypt from 'bcrypt';
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export const getMeService = async (userId) => {
   const user = await getUserByIdModel(userId);
   if (!user) {
@@ -16,15 +18,22 @@ export const getMeService = async (userId) => {
   return user;
 };
 
-export const updateMeService = async (userId, { name, email }) => {
+export const updateMeService = async (userId, body) => {
+  const name  = (body.name  ?? '').trim();
+  const email = (body.email ?? '').trim().toLowerCase();
+
   if (!name || !email) {
     const err = new Error('name and email are required');
     err.status = 400; throw err;
   }
 
-  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (name.length > 100) {
+    const err = new Error('name must be 100 characters or fewer');
+    err.status = 400; throw err;
+  }
+
   if (!EMAIL_RE.test(email)) {
-    const err = new Error('Invalid email format');
+    const err = new Error('Invalid email address');
     err.status = 400; throw err;
   }
 
@@ -49,6 +58,10 @@ export const changePasswordService = async (userId, { currentPassword, newPasswo
   }
   if (newPassword.length < 6) {
     const err = new Error('New password must be at least 6 characters');
+    err.status = 400; throw err;
+  }
+  if (newPassword.length > 72) {
+    const err = new Error('New password must be 72 characters or fewer');
     err.status = 400; throw err;
   }
 

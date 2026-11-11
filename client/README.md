@@ -1,16 +1,39 @@
-# React + Vite
+# FinTrackET — Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend for the FinTrackET expense and budget manager.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Environment Variables
 
-## React Compiler
+Copy `.env.example` to `.env` before running:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+cp .env.example .env
+```
 
-## Expanding the ESLint configuration
+| Variable | Description |
+|---|---|
+| `VITE_API_URL` | Base URL of the Express server, e.g. `http://localhost:4000` |
+| `VITE_USE_MOCK` | Set to `true` to use the built-in mock API (no backend needed), `false` to use the real server |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the Vite dev server on `http://localhost:5173` |
+| `npm run build` | Production build to `dist/` |
+| `npm run lint` | Run ESLint |
+
+---
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+See the [root README](../README.md) for the full setup guide including the server and database.

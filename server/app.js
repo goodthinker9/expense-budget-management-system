@@ -21,7 +21,6 @@ app.use(cors({
 app.get('/', (_req, res) => {
   res.status(200).json({ message: 'Server is accepting requests.' });
 });
-
 app.use('/api/auth',        authRouter);
 app.use('/api/category',    categoryRouter);
 app.use('/api/transaction', transactionRouter);

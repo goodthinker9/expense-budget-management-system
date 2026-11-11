@@ -82,14 +82,7 @@ const features = [
   },
 ];
 
-const reviews = [
-  { stars: 5, text: '"FinTrackET has helped me better understand my finances tremendously. You all have made a fantastic product and I\'m glad I found it. Thank you, thank you, thank you!"' },
-  { stars: 5, text: '"This is the app I\'ve always wanted. Well worth the price!"' },
-  { stars: 5, text: '"FinTrackET then was the best but turns out Monarch keeping all the same just had more. The amazing insights into my finances and well worth the extremely reasonable price tag."' },
-  { stars: 5, text: '"Worth every penny! Great features that are always getting added. Even better customer service!"' },
-  { stars: 5, text: '"The UI interface and ease of use and absolutely love all the features especially the flexibility with budgeting by category or group or by subcategory and the concept of a \'family\' or \'household\' allowing for flagging transactions as \'family member\' is the cherry on the cake."' },
-  { stars: 5, text: '"Monarch has been a game changer for how my wife and I manage our finances. It\'s transformed our money conversations from stressful guesswork into a clear, shared plan of action."' },
-];
+
 
 export default function Pricing() {
   const [annual, setAnnual] = useState(true);
@@ -208,23 +201,6 @@ export default function Pricing() {
                     <div className="feat-row-check">{row.plus ? <span className="check orange">✓</span> : <span className="check gray">—</span>}</div>
                   </div>
                 ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── RATING ── */}
-      <section className="mp-section" style={{ textAlign: 'center' }}>
-        <div className="mp-inner">
-          <div className="pricing-rating">★★★★★ <span>4.9</span></div>
-          <p style={{ color: '#a8a89a', fontSize: '0.875rem', marginBottom: '2.5rem' }}>400,000+ reviews</p>
-          <h2 className="mp-h2">The reviews are in</h2>
-          <div className="pricing-reviews">
-            {reviews.map((r, i) => (
-              <div key={i} className="pricing-review-card">
-                <div className="stars">{'★'.repeat(r.stars)}</div>
-                <p>{r.text}</p>
               </div>
             ))}
           </div>

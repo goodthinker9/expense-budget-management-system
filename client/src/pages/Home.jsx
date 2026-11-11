@@ -1,27 +1,8 @@
 import { Link } from 'react-router-dom';
 import HomeNav from '../components/HomeNav';
 import HomeFooter from '../components/HomeFooter';
-import { IconChart, IconWallet, IconTarget, IconStar, IconArrowRight } from '../components/Icons';
+import { IconChart, IconWallet, IconTarget, IconTransactions, IconBudget, IconReports, IconArrowRight } from '../components/Icons';
 import './Home.css';
-
-const reviews = [
-  { stars: 5, text: 'I love everything about this app. Building a budget is easy, tracking spending is awesome, and everything I wanted in an app this can do!', author: 'App Store Review' },
-  { stars: 5, text: 'Because of this app, I feel like I am not winging it financially anymore and feel on top of my spending.', author: 'App Store Review' },
-  { stars: 5, text: 'Finally a financial dashboard that allows for intuitive customization but also has a powerful set of pre-built functionality!', author: 'App Store Review' },
-  { stars: 5, text: 'I love how many features (bill calendar, cash flow manager, easy budgeting, goal setup and tracking) allow you to get a crystal clear picture.', author: 'App Store Review' },
-  { stars: 5, text: 'FinTrackET shutting down Mint was a blessing in disguise. Way better and the connections to institutions way more reliable.', author: 'App Store Review' },
-  { stars: 5, text: 'Its ability to recognize recurring bills is incredible, makes me less anxious worrying that I\'ll miss something. Run, don\'t walk!', author: 'App Store Review' },
-];
-
-function Stars({ n }) {
-  return (
-    <div className="stars">
-      {Array.from({ length: n }).map((_, i) => (
-        <IconStar key={i} size={14} color="#f59e0b" filled />
-      ))}
-    </div>
-  );
-}
 
 export default function Home() {
   return (
@@ -38,12 +19,6 @@ export default function Home() {
           <Link to="/register" className="btn btn-primary hp-hero-btn">
             Create better money habits
           </Link>
-        </div>
-        {/* award badges row */}
-        <div className="hp-awards">
-          {['★★★★★', '★★★★★', '★★★★★', '★★★★★'].map((s, i) => (
-            <div key={i} className="hp-award">{s}</div>
-          ))}
         </div>
       </section>
 
@@ -336,26 +311,35 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── REVIEWS ── */}
-      <section className="hp-section hp-reviews">
+      {/* ── WHAT YOU CAN DO ── */}
+      <section className="hp-section hp-features">
         <div className="hp-inner">
-          <h2 className="hp-h2">What our members say</h2>
-          <div className="hp-reviews-grid">
-            {reviews.map((r, i) => (
-              <div key={i} className="hp-review-card">
-                <Stars n={r.stars} />
-                <p>"{r.text}"</p>
-                <span>{r.author}</span>
+          <h2 className="hp-h2" style={{ textAlign: 'center', marginBottom: '0.75rem' }}>What you can do with FinTrackET</h2>
+          <p className="hp-desc" style={{ textAlign: 'center', margin: '0 auto 2.5rem' }}>
+            Everything you need to stay on top of your money, in one place.
+          </p>
+          <div className="hp-features-grid">
+            <div className="hp-feature-card">
+              <div className="hp-feature-icon">
+                <IconTransactions size={24} color="#e8572a" />
               </div>
-            ))}
-          </div>
-          <div className="hp-press-quote">
-            <blockquote>
-              "FinTrackET offers a ton of features, including customizable reports, goal tracking and the ability to
-              manage all of your bills and subscriptions in one calendar. For no extra cost, you can invite your
-              partner to your account and get a joint view of your shared finances."
-            </blockquote>
-            <cite>— USA Today · Financial Review October 2026</cite>
+              <h3>Track transactions</h3>
+              <p>Add, search, sort and export your income and expenses. Filter by date, category or type and see the full picture at any time.</p>
+            </div>
+            <div className="hp-feature-card">
+              <div className="hp-feature-icon">
+                <IconBudget size={24} color="#e8572a" />
+              </div>
+              <h3>Plan with budgets</h3>
+              <p>Set a monthly spending limit per category and get a clear view of how much you have left — and an alert the moment you go over.</p>
+            </div>
+            <div className="hp-feature-card">
+              <div className="hp-feature-icon">
+                <IconReports size={24} color="#e8572a" />
+              </div>
+              <h3>Understand your spending</h3>
+              <p>Monthly bar charts and category breakdowns show exactly where your money goes so you can make smarter decisions next month.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -368,9 +352,8 @@ export default function Home() {
             <div className="hp-community-card">
               <div className="hp-community-icon">💬</div>
               <div>
-                <div className="hp-community-title">Reddit Community</div>
-                <div className="hp-community-desc">Join our growing community of 50,000+ members. Ask questions and share feedback.</div>
-                <a href="#" className="hp-community-link">r/fintrucket →</a>
+                <div className="hp-community-title">Community</div>
+                <div className="hp-community-desc">Ask questions, share tips and give feedback with other FinTrackET users.</div>
               </div>
             </div>
             <div className="hp-community-card">
@@ -390,8 +373,8 @@ export default function Home() {
         <div className="hp-inner hp-try-inner">
           <div className="hp-try-text">
             <p className="hp-label">GET STARTED</p>
-            <h2 className="hp-h2-sm">Try FinTrackET free for 7 days</h2>
-            <p className="hp-desc-sm">We'll show your finances in a whole new light, and give you confidence about your money and your partner a total upgrade.</p>
+            <h2 className="hp-h2-sm">Start managing your money today</h2>
+            <p className="hp-desc-sm">Sign up for free and get a clear view of your income, expenses and budgets from day one.</p>
             <Link to="/register" className="btn btn-primary hp-try-btn">
               Free sign up <IconArrowRight size={16} color="white" />
             </Link>

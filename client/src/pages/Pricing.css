@@ -230,47 +230,9 @@
 .check.orange { color: #e8572a; font-weight: 700; font-size: 1rem; }
 .check.gray { color: #3a3a32; font-size: 1rem; }
 
-/* Rating */
-.pricing-rating {
-  font-size: 1.5rem;
-  color: #f59e0b;
-  margin-bottom: 0.5rem;
-}
-.pricing-rating span {
-  color: #f5f4ef;
-  font-weight: 800;
-  font-size: 1.75rem;
-  margin-left: 0.5rem;
-}
-
-.pricing-reviews {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-top: 2rem;
-  text-align: left;
-}
-
-.pricing-review-card {
-  background: #252520;
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 12px;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-.pricing-review-card p {
-  font-size: 0.8rem;
-  color: #a8a89a;
-  line-height: 1.6;
-  font-style: italic;
-}
-
 @media (max-width: 768px) {
   .pricing-cards { grid-template-columns: 1fr; }
   .pricing-why-grid { grid-template-columns: 1fr; }
   .pricing-why-reasons { grid-template-columns: 1fr; }
-  .pricing-reviews { grid-template-columns: 1fr; }
   .feat-table-head, .feat-row { grid-template-columns: 1fr 80px 80px; }
 }

@@ -18,6 +18,7 @@
   display: flex;
   gap: 4rem;
   margin-bottom: 3rem;
+  align-items: flex-start;
 }
 
 .hf-brand { flex-shrink: 0; }
@@ -30,13 +31,22 @@
   font-weight: 800;
   color: #f5f4ef;
   text-decoration: none;
+  margin-bottom: 0.5rem;
 }
 
 .hf-accent { color: #e8572a; }
 
+.hf-tagline {
+  font-size: 0.8rem;
+  color: #6b6b5e;
+  line-height: 1.5;
+  max-width: 220px;
+  margin: 0;
+}
+
 .hf-cols {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
   flex: 1;
 }
@@ -46,7 +56,6 @@
   font-weight: 700;
   color: #f5f4ef;
   margin-bottom: 0.75rem;
-  text-transform: none;
 }
 
 .hf-col-link {
@@ -71,26 +80,7 @@
   gap: 1rem;
 }
 
-.hf-stores {
-  display: flex;
-  gap: 1rem;
-}
-
-.hf-store {
-  background: #252520;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 6px;
-  padding: 0.375rem 0.75rem;
-  font-size: 0.75rem;
-  color: #c8c8bc;
-  cursor: pointer;
-}
-
-@media (max-width: 900px) {
-  .hf-top { flex-direction: column; gap: 2rem; }
-  .hf-cols { grid-template-columns: repeat(3, 1fr); }
-}
-
-@media (max-width: 540px) {
+@media (max-width: 600px) {
+  .hf-top  { flex-direction: column; gap: 2rem; }
   .hf-cols { grid-template-columns: repeat(2, 1fr); }
 }

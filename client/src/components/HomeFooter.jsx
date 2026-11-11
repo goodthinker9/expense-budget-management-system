@@ -1,33 +1,6 @@
 import { Link } from 'react-router-dom';
 import './HomeFooter.css';
 
-const footerCols = [
-  {
-    title: 'Features',
-    links: ['Tracking', 'Budgeting', 'Planning'],
-  },
-  {
-    title: 'Compare',
-    links: ['vs. YNAB', 'vs. Simplifi', 'vs. Credit Karma', 'vs. Mint'],
-  },
-  {
-    title: 'Calculators',
-    links: ['Financial Health Calculator', 'Debt Payoff Calculator', 'Mortgage Calculator'],
-  },
-  {
-    title: 'Other Resources',
-    links: ["What's New", 'Bank Connections', 'Professional Directory', 'Terms of Use', 'Privacy Policy', 'Promo Codes'],
-  },
-  {
-    title: 'Company',
-    links: ['Blog', 'About', 'Careers', 'Press', 'Partnerships', 'Privacy and Security'],
-  },
-  {
-    title: 'Support',
-    links: ['Help Center', 'System Health', 'Contact', 'Cookie Preferences'],
-  },
-];
-
 function HomeFooter() {
   return (
     <footer className="hf">
@@ -38,16 +11,21 @@ function HomeFooter() {
               <span>💰</span>
               <span>FinTrack<span className="hf-accent">ET</span></span>
             </Link>
+            <p className="hf-tagline">Personal finance in ETB — simple, honest, yours.</p>
           </div>
           <div className="hf-cols">
-            {footerCols.map((col) => (
-              <div key={col.title} className="hf-col">
-                <div className="hf-col-title">{col.title}</div>
-                {col.links.map((l) => (
-                  <a key={l} href="#" className="hf-col-link">{l}</a>
-                ))}
-              </div>
-            ))}
+            <div className="hf-col">
+              <div className="hf-col-title">Product</div>
+              <Link to="/login"       className="hf-col-link">Dashboard</Link>
+              <Link to="/login"       className="hf-col-link">Transactions</Link>
+              <Link to="/login"       className="hf-col-link">Budgets</Link>
+              <Link to="/login"       className="hf-col-link">Reports</Link>
+            </div>
+            <div className="hf-col">
+              <div className="hf-col-title">Account</div>
+              <Link to="/login"    className="hf-col-link">Sign in</Link>
+              <Link to="/register" className="hf-col-link">Create account</Link>
+            </div>
           </div>
         </div>
         <div className="hf-bottom">

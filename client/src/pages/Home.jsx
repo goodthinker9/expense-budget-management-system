@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import HomeNav from '../components/HomeNav';
 import HomeFooter from '../components/HomeFooter';
-import { IconChart, IconWallet, IconTarget, IconTransactions, IconBudget, IconReports, IconArrowRight } from '../components/Icons';
+import {
+  IconChart, IconArrowRight,
+  IconTransactions, IconBudget, IconReports,
+} from '../components/Icons';
 import './Home.css';
 
 export default function Home() {
@@ -13,11 +16,11 @@ export default function Home() {
       <section className="hp-hero">
         <div className="hp-hero-overlay" />
         <div className="hp-hero-content">
-          <p className="hp-hero-eyebrow">THE MODERN WAY</p>
-          <h1 className="hp-hero-title">The modern way to manage money</h1>
-          <p className="hp-hero-sub">Budget, track, and plan for the future — all in one place.</p>
+          <p className="hp-hero-eyebrow">PERSONAL FINANCE</p>
+          <h1 className="hp-hero-title">Know exactly where your money goes</h1>
+          <p className="hp-hero-sub">Track income and expenses, set category budgets, and read monthly reports — all in one place.</p>
           <Link to="/register" className="btn btn-primary hp-hero-btn">
-            Create better money habits
+            Get started for free
           </Link>
         </div>
       </section>
@@ -28,20 +31,20 @@ export default function Home() {
           <p className="hp-label">WHAT IS FINTRUCKET?</p>
           <h2 className="hp-h2">Your home base for money clarity</h2>
           <p className="hp-desc">
-            FinTrackET simplifies finances by bringing all your accounts together into one clear view.
-            Always know where your money is and where it's going, achieve your goals quicker,
-            and collaborate with your partner or professional at no extra cost.
+            FinTrackET gives you one place to record every transaction, organise it into
+            categories, stay inside your monthly budgets, and understand your spending
+            through clear charts and reports — all in ETB.
           </p>
           {/* Dashboard mock */}
           <div className="hp-dashboard-mock">
             <div className="hp-mock-sidebar">
               <div className="hp-mock-logo">💰 FinTrackET</div>
-              {['Dashboard', 'Accounts', 'Transactions', 'Budgets', 'Reports', 'Goals'].map(item => (
+              {['Dashboard', 'Transactions', 'Categories', 'Budgets', 'Reports'].map(item => (
                 <div key={item} className="hp-mock-nav">{item}</div>
               ))}
             </div>
             <div className="hp-mock-main">
-              <div className="hp-mock-header">Net Worth <strong>ETB 215,000</strong></div>
+              <div className="hp-mock-header">Balance <strong>ETB 12,450.00</strong></div>
               <div className="hp-mock-chart">
                 <svg viewBox="0 0 300 80" preserveAspectRatio="none">
                   <defs>
@@ -59,7 +62,7 @@ export default function Home() {
                   { name: 'Salary', cat: 'Income', amt: '+ETB 25,000', c: 'green' },
                   { name: 'Groceries', cat: 'Food', amt: '-ETB 3,200', c: 'red' },
                   { name: 'Rent', cat: 'Housing', amt: '-ETB 8,500', c: 'red' },
-                  { name: 'Transport', cat: 'Travel', amt: '-ETB 1,100', c: 'red' },
+                  { name: 'Transport', cat: 'Travel', amt: '-ETB 850', c: 'red' },
                 ].map(r => (
                   <div key={r.name} className="hp-mock-row">
                     <span className="hp-mock-row-name">{r.name}</span>
@@ -78,15 +81,15 @@ export default function Home() {
         <div className="hp-inner">
           <h2 className="hp-h2">Everything you need, all in one app</h2>
           <p className="hp-desc">
-            Connect your accounts and FinTrackET will do the heavy lifting to categorize your finances.
-            From there, you can track, budget, collaborate, and set goals specific to you.
+            Record transactions, group them by category, set budgets and read reports.
+            No bank connections required — you stay in control of your data.
           </p>
           <div className="hp-feat-grid">
             {[
-              { Icon: IconChart, label: 'Know where you stand', desc: "Always know where your money is going and cash flow. Get real-time notifications about where you're at." },
-              { Icon: IconWallet, label: 'Budgeting from first principle', desc: "Create a budget that fits your needs — and one that you'll actually stick to — with Flex Budgets." },
-              { Icon: IconTarget, label: 'Make your money go further', desc: 'Visualize your path to any financial goal — from a vacation to a new house — and track progress.' },
-              { Icon: IconChart, label: 'Make smarter money moves', desc: 'Access deep analytics to see trends in your spending, income, and net worth over time.' },
+              { Icon: IconTransactions, label: 'Track every transaction', desc: 'Add income and expenses, search and sort the list, filter by type or date, and export to CSV at any time.' },
+              { Icon: IconBudget,       label: 'Budget by category',       desc: 'Set a monthly ETB limit for each spending category and see a progress bar fill as you spend.' },
+              { Icon: IconReports,      label: 'Monthly reports',           desc: 'An income-vs-expense bar chart and a category breakdown chart update automatically every month.' },
+              { Icon: IconChart,        label: 'Dashboard at a glance',     desc: 'Your balance, income, expenses and top spending categories are summarised on one screen.' },
             ].map((f, i) => (
               <div key={i} className="hp-feat-card">
                 <div className="hp-feat-icon">
@@ -94,65 +97,32 @@ export default function Home() {
                 </div>
                 <h3>{f.label}</h3>
                 <p>{f.desc}</p>
-                <a href="#" className="hp-feat-link">
-                  Learn more <IconArrowRight size={14} color="#e8572a" />
-                </a>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── FEATURE ALTERNATING ROWS ── */}
+      {/* ── FEATURE ALT ROWS ── */}
       <section className="hp-section hp-rows">
         <div className="hp-inner">
-          {/* Row 1: Net Worth */}
-          <div className="hp-alt-row">
-            <div className="hp-alt-text">
-              <p className="hp-label">NET WORTH</p>
-              <h2 className="hp-h2-sm">All your accounts, in one place</h2>
-              <p className="hp-desc-sm">Connect all your bank accounts, credit cards, loans, real estate, and investments to see your entire financial picture in one place. It's easier to align and plan when everything is together.</p>
-            </div>
-            <div className="hp-alt-visual">
-              <div className="hp-nw-card">
-                <div className="hp-nw-label">Net Worth</div>
-                <div className="hp-nw-amount">ETB 215,000</div>
-                {[
-                  { name: 'Commercial Bank', last: '9701', amt: 'ETB 40,000' },
-                  { name: 'Savings Account', last: '4251', amt: 'ETB 25,000' },
-                  { name: 'Investment', last: '6632', amt: 'ETB 150,000' },
-                ].map(a => (
-                  <div key={a.name} className="hp-nw-row">
-                    <div className="hp-nw-row-left">
-                      <div className="hp-nw-dot" />
-                      <div>
-                        <div className="hp-nw-row-name">{a.name}</div>
-                        <div className="hp-nw-row-last">•••• {a.last}</div>
-                      </div>
-                    </div>
-                    <div className="hp-nw-row-amt">{a.amt}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
 
-          {/* Row 2: Transactions */}
-          <div className="hp-alt-row reverse">
+          {/* Row 1: Transactions */}
+          <div className="hp-alt-row">
             <div className="hp-alt-visual">
               <div className="hp-tx-card">
-                <div className="hp-tx-header">Transactions <span className="hp-tx-badge">5 need review</span></div>
+                <div className="hp-tx-header">Transactions</div>
                 {[
-                  { name: 'Starbucks', cat: 'Coffee', amt: '-ETB 120' },
-                  { name: 'Apple', cat: 'Tech', amt: '-ETB 499' },
-                  { name: 'Whole Foods', cat: 'Groceries', amt: '-ETB 850' },
-                  { name: 'Urban Items', cat: 'Gifts', amt: '-ETB 650' },
+                  { name: 'Salary',     cat: 'Income',   amt: '+ETB 25,000', income: true },
+                  { name: 'Groceries',  cat: 'Food',     amt: '-ETB 3,200',  income: false },
+                  { name: 'Electricity',cat: 'Utilities',amt: '-ETB 1,100',  income: false },
+                  { name: 'Transport',  cat: 'Travel',   amt: '-ETB 850',    income: false },
                 ].map(t => (
                   <div key={t.name} className="hp-tx-row">
-                    <div className="hp-tx-dot" />
+                    <div className="hp-tx-dot" style={{ background: t.income ? '#10b981' : '#e8572a' }} />
                     <span className="hp-tx-name">{t.name}</span>
                     <span className="hp-tx-cat">{t.cat}</span>
-                    <span className="hp-tx-amt">{t.amt}</span>
+                    <span className="hp-tx-amt" style={{ color: t.income ? '#059669' : '#ef4444' }}>{t.amt}</span>
                   </div>
                 ))}
               </div>
@@ -160,47 +130,58 @@ export default function Home() {
             <div className="hp-alt-text">
               <p className="hp-label">TRANSACTIONS</p>
               <h2 className="hp-h2-sm">Every transaction in one list</h2>
-              <p className="hp-desc-sm">FinTrackET brings all your transactions into one clean, searchable list — no more jumping between apps or bank websites. Mark transactions as reviewed to stay on top of your spending.</p>
+              <p className="hp-desc-sm">Add, edit and delete income and expense records. Search by description or category, sort any column, filter by date range or type, and export filtered results to CSV.</p>
             </div>
           </div>
 
-          {/* Row 3: Subscriptions */}
-          <div className="hp-alt-row">
-            <div className="hp-alt-text">
-              <p className="hp-label">RECURRING</p>
-              <h2 className="hp-h2-sm">Take control of your subscriptions</h2>
-              <p className="hp-desc-sm">FinTrackET automatically detects your recurring subscriptions — like streaming services, gyms, or app memberships — so you never lose track of what you're paying for.</p>
-            </div>
+          {/* Row 2: Budgets */}
+          <div className="hp-alt-row reverse">
             <div className="hp-alt-visual">
-              <div className="hp-sub-grid">
+              <div className="hp-budget-card">
+                <div className="hp-budget-title">Budgets — November 2026</div>
                 {[
-                  { label: 'Streaming', color: '#ef4444' },
-                  { label: 'Music', color: '#10b981' },
-                  { label: 'Cloud', color: '#3b82f6' },
-                  { label: 'Gym', color: '#f59e0b' },
-                  { label: 'Shopping', color: '#8b5cf6' },
-                  { label: 'Gaming', color: '#e8572a' },
-                ].map(s => (
-                  <div key={s.label} className="hp-sub-item" style={{ borderTop: `3px solid ${s.color}` }}>
-                    <div className="hp-sub-dot" style={{ background: s.color }} />
-                    <span>{s.label}</span>
+                  { cat: 'Food',      spent: 3200, limit: 4000, pct: 80,  color: '#f59e0b' },
+                  { cat: 'Housing',   spent: 8500, limit: 8500, pct: 100, color: '#ef4444' },
+                  { cat: 'Transport', spent: 850,  limit: 2000, pct: 43,  color: '#10b981' },
+                  { cat: 'Utilities', spent: 1100, limit: 1500, pct: 73,  color: '#10b981' },
+                ].map(b => (
+                  <div key={b.cat} className="hp-budget-row">
+                    <div className="hp-budget-row-top">
+                      <span className="hp-budget-cat">{b.cat}</span>
+                      <span className="hp-budget-pct" style={{ color: b.pct >= 100 ? '#ef4444' : b.pct >= 80 ? '#d97706' : '#059669' }}>
+                        {b.pct}%
+                      </span>
+                    </div>
+                    <div className="hp-budget-track">
+                      <div className="hp-budget-fill" style={{ width: `${Math.min(b.pct, 100)}%`, background: b.color }} />
+                    </div>
+                    <div className="hp-budget-meta">
+                      <span>ETB {b.spent.toLocaleString()}</span>
+                      <span style={{ color: '#9ca3af' }}> / ETB {b.limit.toLocaleString()}</span>
+                      {b.pct >= 100 && <span className="hp-budget-over">Over budget</span>}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
+            <div className="hp-alt-text">
+              <p className="hp-label">BUDGETS</p>
+              <h2 className="hp-h2-sm">Monthly limits, per category</h2>
+              <p className="hp-desc-sm">Set an ETB spending limit for any category and month. A progress bar tracks how much you have used, and an over-budget warning appears the moment you exceed the limit.</p>
+            </div>
           </div>
 
-          {/* Row 4: Reports */}
-          <div className="hp-alt-row reverse">
+          {/* Row 3: Reports */}
+          <div className="hp-alt-row">
             <div className="hp-alt-visual">
               <div className="hp-report-card">
-                <div className="hp-report-title">Spending by Category</div>
+                <div className="hp-report-title">Spending by Category — Nov 2026</div>
                 {[
-                  { cat: 'Food', pct: 35, color: '#e8572a' },
-                  { cat: 'Housing', pct: 28, color: '#f59e0b' },
-                  { cat: 'Transport', pct: 18, color: '#10b981' },
-                  { cat: 'Entertainment', pct: 12, color: '#3b82f6' },
-                  { cat: 'Other', pct: 7, color: '#8b5cf6' },
+                  { cat: 'Housing',   pct: 46, color: '#e8572a' },
+                  { cat: 'Food',      pct: 24, color: '#f59e0b' },
+                  { cat: 'Utilities', pct: 17, color: '#10b981' },
+                  { cat: 'Transport', pct: 9,  color: '#3b82f6' },
+                  { cat: 'Other',     pct: 4,  color: '#8b5cf6' },
                 ].map(r => (
                   <div key={r.cat} className="hp-report-row">
                     <span className="hp-report-cat">{r.cat}</span>
@@ -214,100 +195,11 @@ export default function Home() {
             </div>
             <div className="hp-alt-text">
               <p className="hp-label">REPORTS</p>
-              <h2 className="hp-h2-sm">Visualize the flow of money</h2>
-              <p className="hp-desc-sm">Dive deep into your finances with customizable charts that reveal where your money's going. Whether you're tracking spending trends, income, or net worth over time.</p>
+              <h2 className="hp-h2-sm">Understand your spending</h2>
+              <p className="hp-desc-sm">A monthly income-vs-expenses bar chart and a spending-by-category breakdown show exactly where your money goes — and let you export the full dataset to CSV.</p>
             </div>
           </div>
 
-          {/* Row 5: Goals */}
-          <div className="hp-alt-row">
-            <div className="hp-alt-text">
-              <p className="hp-label">GOALS</p>
-              <h2 className="hp-h2-sm">Your goals, on track</h2>
-              <p className="hp-desc-sm">Create a clear plan for what matters to you — whether it's a vacation, a car fund, or retirement. Set targets, track your progress, and stay motivated as savings grow.</p>
-            </div>
-            <div className="hp-alt-visual">
-              <div className="hp-goals-card">
-                {[
-                  { name: 'Emergency Fund', target: 48000, current: 48000, color: '#10b981' },
-                  { name: 'Vacation', target: 8000, current: 4310, color: '#e8572a' },
-                  { name: 'New Car', target: 55000, current: 21014, color: '#3b82f6' },
-                  { name: 'Home Down Payment', target: 100000, current: 9018, color: '#f59e0b' },
-                ].map(g => (
-                  <div key={g.name} className="hp-goal-item">
-                    <div className="hp-goal-top">
-                      <span className="hp-goal-name">{g.name}</span>
-                      <span className="hp-goal-amt">ETB {g.current.toLocaleString()}</span>
-                    </div>
-                    <div className="hp-goal-track">
-                      <div className="hp-goal-fill" style={{ width: Math.min(100, Math.round(g.current / g.target * 100)) + '%', background: g.color }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Row 6: Devices */}
-          <div className="hp-alt-row reverse">
-            <div className="hp-alt-visual hp-devices">
-              <div className="hp-app-icons">
-                {[
-                  { label: 'Bank', color: '#3b82f6' },
-                  { label: 'Pay', color: '#10b981' },
-                  { label: 'Invest', color: '#e8572a' },
-                  { label: 'Save', color: '#f59e0b' },
-                  { label: 'Budget', color: '#8b5cf6' },
-                  { label: 'Goals', color: '#ec4899' },
-                  { label: 'Reports', color: '#14b8a6' },
-                  { label: 'Track', color: '#e8572a' },
-                  { label: 'Cards', color: '#3b82f6' },
-                  { label: 'Loans', color: '#f97316' },
-                  { label: 'Crypto', color: '#f59e0b' },
-                  { label: 'Tax', color: '#6366f1' },
-                ].map((item, i) => (
-                  <div key={i} className="hp-app-icon" style={{ borderTop: `3px solid ${item.color}` }}>
-                    <span className="hp-app-icon-label">{item.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="hp-alt-text">
-              <p className="hp-label">APPS</p>
-              <h2 className="hp-h2-sm">On every device, always in sync</h2>
-              <p className="hp-desc-sm">FinTrackET works seamlessly across web, iOS, and Android — so you can check in on your money anytime, anywhere. Your finances are always in sync and ready when you are.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── DATA CONNECTIVITY ── */}
-      <section className="hp-section hp-data">
-        <div className="hp-inner hp-data-inner">
-          <div className="hp-data-text">
-            <p className="hp-label">CONNECTIVITY</p>
-            <h2 className="hp-h2-sm">Best-in-class data connectivity</h2>
-            <p className="hp-desc-sm">FinTrackET syncs with multiple financial data providers so you get the most complete and accurate picture. No manual entry needed — track your accounts and keep them in sync.</p>
-          </div>
-          <div className="hp-data-visual">
-            {/* Styled connection visualization - no unnecessary image */}
-            <div className="hp-connection-grid">
-              {[
-                { label: 'Commercial Bank of Ethiopia', color: '#3b82f6' },
-                { label: 'Awash Bank', color: '#10b981' },
-                { label: 'Dashen Bank', color: '#e8572a' },
-                { label: 'Abyssinia Bank', color: '#f59e0b' },
-                { label: 'Nib Bank', color: '#8b5cf6' },
-                { label: 'Wegagen Bank', color: '#ec4899' },
-              ].map((b, i) => (
-                <div key={i} className="hp-bank-chip" style={{ borderLeft: `3px solid ${b.color}` }}>
-                  <div className="hp-bank-dot" style={{ background: b.color }} />
-                  <span>{b.label}</span>
-                  <span className="hp-bank-status">Connected</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
@@ -331,7 +223,7 @@ export default function Home() {
                 <IconBudget size={24} color="#e8572a" />
               </div>
               <h3>Plan with budgets</h3>
-              <p>Set a monthly spending limit per category and get a clear view of how much you have left — and an alert the moment you go over.</p>
+              <p>Set a monthly ETB limit per category. A progress bar fills as you spend, and an alert fires the moment you go over.</p>
             </div>
             <div className="hp-feature-card">
               <div className="hp-feature-icon">
@@ -339,30 +231,6 @@ export default function Home() {
               </div>
               <h3>Understand your spending</h3>
               <p>Monthly bar charts and category breakdowns show exactly where your money goes so you can make smarter decisions next month.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── COMMUNITY ── */}
-      <section className="hp-section hp-community">
-        <div className="hp-inner hp-community-inner">
-          <h2 className="hp-h2">Community resources</h2>
-          <div className="hp-community-cards">
-            <div className="hp-community-card">
-              <div className="hp-community-icon">💬</div>
-              <div>
-                <div className="hp-community-title">Community</div>
-                <div className="hp-community-desc">Ask questions, share tips and give feedback with other FinTrackET users.</div>
-              </div>
-            </div>
-            <div className="hp-community-card">
-              <div className="hp-community-icon">📝</div>
-              <div>
-                <div className="hp-community-title">Our Blog</div>
-                <div className="hp-community-desc">We share expert insights and data-backed research that helps you with your money questions.</div>
-                <a href="#" className="hp-community-link">Read now →</a>
-              </div>
             </div>
           </div>
         </div>
@@ -380,11 +248,10 @@ export default function Home() {
             </Link>
           </div>
           <div className="hp-try-visual">
-            {/* Phone mockup - no unnecessary image */}
             <div className="hp-phone-mock">
               <div className="hp-phone-header">
-                <div className="hp-phone-title">Net Worth</div>
-                <div className="hp-phone-amount">ETB 215,000</div>
+                <div className="hp-phone-title">Balance</div>
+                <div className="hp-phone-amount">ETB 12,450</div>
               </div>
               <div className="hp-phone-chart">
                 <svg viewBox="0 0 200 60" preserveAspectRatio="none" style={{ width: '100%', height: '60px' }}>
@@ -399,9 +266,9 @@ export default function Home() {
                 </svg>
               </div>
               {[
-                { name: 'Income', val: '+ETB 25,000', c: '#10b981' },
+                { name: 'Income',   val: '+ETB 25,000', c: '#10b981' },
                 { name: 'Expenses', val: '-ETB 12,550', c: '#ef4444' },
-                { name: 'Savings', val: '+ETB 12,450', c: '#3b82f6' },
+                { name: 'Balance',  val: 'ETB 12,450',  c: '#2563eb' },
               ].map(r => (
                 <div key={r.name} className="hp-phone-row">
                   <span>{r.name}</span>

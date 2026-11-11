@@ -92,28 +92,6 @@ export default function ForProfessionals() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
-      <section className="mp-section">
-        <div className="mp-inner">
-          {[
-            { name: 'Tigist Worku', title: 'CFP®, AFC®', text: 'FinTrackET is the most effective tool I use in helping my clients feel confident with their finances. It\'s a flexible tool, easy to use, and the reporting capabilities allow me to have better conversations with clients around their finances.' },
-            { name: 'Simon Haile', title: 'CFP®, EA, Campiron', text: 'One of the largest drivers of the success of a financial plan is the annual expense amount a client will face in their non-working years. FinTrackET helps lead to more accurate financial plans if used properly.' },
-            { name: 'Natalie Tesfaye', title: 'CFP®, BFA®, The Goodland Group', text: 'FinTrackET enables us to provide a beautiful financial dashboard experience for our clients that tracks their net worth, cash flow and progress towards their goals.' },
-          ].map(t => (
-            <div key={t.name} className="mp-testimonial">
-              <div className="mp-testimonial-avatar">{t.name[0]}</div>
-              <div className="mp-testimonial-body">
-                <p className="mp-testimonial-text">"{t.text}"</p>
-                <div className="mp-testimonial-author">
-                  <strong>{t.name}</strong>
-                  <span>{t.title}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── HOW IT WORKS ── */}
       <section className="mp-section mp-dark-section">
         <div className="mp-inner">

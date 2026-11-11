@@ -171,19 +171,6 @@ export default function ForCouples() {
         </div>
       </section>
 
-      {/* ── QUOTE ── */}
-      <section className="mp-section mp-quote-section">
-        <div className="mp-inner mp-quote-inner">
-          <blockquote className="mp-big-quote">
-            "FinTrackET is the best budgeting app overall for 2024. It's the best for anyone looking to cut expenses and increase savings — especially couples or families."
-          </blockquote>
-          <div className="mp-quote-source">
-            <strong>Wall Street Journal</strong>
-            <span>The 5 Best Budgeting Apps to Make Managing Your Money Easier in 2024</span>
-          </div>
-        </div>
-      </section>
-
       {/* ── FAQ ── */}
       <section className="mp-section">
         <div className="mp-inner">

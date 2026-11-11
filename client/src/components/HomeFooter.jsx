@@ -52,10 +52,6 @@ function HomeFooter() {
         </div>
         <div className="hf-bottom">
           <span>© 2026 FinTrackET. Built with ❤️ for Ethiopia.</span>
-          <div className="hf-stores">
-            <span className="hf-store">🍎 App Store</span>
-            <span className="hf-store">▶ Google Play</span>
-          </div>
         </div>
       </div>
     </footer>

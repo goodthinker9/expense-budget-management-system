@@ -1,7 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../pages/Home';
-import ForCouples from '../pages/ForCouples';
-import ForProfessionals from '../pages/ForProfessionals';
 import Pricing from '../pages/Pricing';
 import Dashboard from '../pages/Dashboard';
 import Login from '../pages/Login';
@@ -19,8 +17,6 @@ function AppRoute() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/for-couples" element={<ForCouples />} />
-        <Route path="/for-professionals" element={<ForProfessionals />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

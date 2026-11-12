@@ -72,7 +72,7 @@ cp .env.example .env
 | `CLIENT_ORIGIN` | React app origin for CORS (e.g. `http://localhost:5173`) |
 
 > **Important:** Use the **Session pooler** (port 5432), not the Transaction pooler (port 6543).  
-> Transaction mode breaks `RETURNING` clauses used throughout this API.
+> The Session pooler (port 5432) is the safest choice for this app.
 
 Example `DATABASE_URL`:
 ```

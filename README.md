@@ -85,7 +85,7 @@ Open `server/.env` and fill in:
 | `JWT_SECRET` | Any long random string |
 | `CLIENT_ORIGIN` | `http://localhost:5173` for local dev |
 
-> **Note:** Use the **Session pooler** (port 5432), not the Transaction pooler (port 6543). Transaction mode breaks `RETURNING` clauses used throughout the API.
+> **Note:** Use the **Session pooler** (port 5432), not the Transaction pooler (port 6543). The Session pooler is the safest choice for this app.
 
 ---
 
